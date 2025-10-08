@@ -1,149 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Support Ticket Form</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f6fa;
-      padding: 30px;
-    }
-    form {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-      margin: auto;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover { background: #0056b3; }
-    #status { text-align: center; margin-top: 15px; font-weight: bold; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support Ticket Form</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+  padding: 30px;
+}
+form {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: auto;
+}
+input, select, textarea, button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:hover { background: #0056b3; }
+#status { text-align: center; margin-top: 15px; font-weight: bold; }
+.hidden { display: none; }
+</style>
 </head>
 <body>
-  <form id="ticketForm">
-    <h2>Submit Support Ticket</h2>
-    <input name="name" placeholder="Full Name" required>
-    <input name="email" type="email" placeholder="Email Address" required>
-    <input name="position" placeholder="Position">
-    <select name="supportLevel" required>
-      <option value="">Select Support Level</option>
-      <option>Regional</option>
-      <option>Provincial</option>
-      <option>Municipal</option>
-    </select>
 
-    <select name="region" id="region" required>
+<form id="ticketForm">
+  <h2>Submit Support Ticket</h2>
+  <input name="name" placeholder="Full Name" required>
+  <input name="email" type="email" placeholder="Email Address" required>
+  <input name="position" placeholder="Position">
+
+  <select name="supportLevel" id="supportLevel" required>
+    <option value="">Select Support Level</option>
+    <option>MPMO Support</option>
+    <option>Provincial Support</option>
+    <option>Regional Support</option>
+    <option>NPMO Technical Workstreams</option>
+  </select>
+
+  <div id="orgFields">
+    <select name="region" id="region" class="hidden">
       <option value="">Select Region</option>
     </select>
-    <select name="province" id="province" required>
+    <select name="province" id="province" class="hidden">
       <option value="">Select Province</option>
     </select>
-    <select name="municipality" id="municipality" required>
+    <select name="municipality" id="municipality" class="hidden">
       <option value="">Select Municipality</option>
     </select>
+  </div>
 
-    <input name="category" placeholder="Category" required>
-    <textarea name="description" placeholder="Describe your issue" required></textarea>
-    <input type="file" id="files" multiple>
-    <button type="submit">Submit Ticket</button>
-    <div id="status"></div>
-  </form>
+  <select name="category" required>
+    <option value="">Select Category</option>
+    <option>HCSC Questions/Masterlists</option>
+    <option>UI/UX</option>
+    <option>User Accounts</option>
+    <option>Additional Features</option>
+    <option>Formula and Logics</option>
+    <option>Reports and Dashboard</option>
+    <option>User Role and Access</option>
+    <option>Functionality Errors</option>
+    <option>Backend</option>
+    <option>Formats</option>
+    <option>Job Aids</option>
+  </select>
 
-  <script>
-  const backendUrl = 'https://script.google.com/macros/s/AKfycbw4P5xcRkzbq_jUnaekqVE4gSm_8jKPPB4OUhVfnD2EUNJ6bQ7eSj7EWDRAfdr5IEbb/exec';
+  <textarea name="description" placeholder="Describe your issue" required></textarea>
+  <input type="file" id="files" multiple>
+  <button type="submit">Submit Ticket</button>
+  <div id="status"></div>
+</form>
 
-  async function loadLocations() {
-    try {
-      const res = await fetch(`${backendUrl}?action=getLocations`);
-      const loc = await res.json();
+<script>
+const backendUrl = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
-      const regionSel = document.getElementById('region');
-      const provinceSel = document.getElementById('province');
-      const muniSel = document.getElementById('municipality');
+async function loadLocations() {
+  const res = await fetch(`${backendUrl}?action=getLocations`);
+  const loc = await res.json();
 
-      regionSel.innerHTML = '<option value="">Select Region</option>' +
-        loc.regions.map(r => `<option>${r}</option>`).join('');
+  const regionSel = document.getElementById('region');
+  const provSel = document.getElementById('province');
+  const muniSel = document.getElementById('municipality');
 
-      regionSel.onchange = () => {
-        const region = regionSel.value;
-        const provinces = loc.provinces[region] || [];
-        provinceSel.innerHTML = '<option value="">Select Province</option>' +
-          provinces.map(p => `<option>${p}</option>`).join('');
-        muniSel.innerHTML = '<option value="">Select Municipality</option>';
-      };
+  regionSel.innerHTML = '<option value="">Select Region</option>' +
+    loc.regions.map(r => `<option>${r}</option>`).join('');
 
-      provinceSel.onchange = () => {
-        const province = provinceSel.value;
-        const munis = loc.municipalities[province] || [];
-        muniSel.innerHTML = '<option value="">Select Municipality</option>' +
-          munis.map(m => `<option>${m}</option>`).join('');
-      };
-    } catch (err) {
-      console.error('Failed to load locations', err);
-    }
+  regionSel.onchange = () => {
+    const region = regionSel.value;
+    const provinces = loc.provinces[region] || [];
+    provSel.innerHTML = '<option value="">Select Province</option>' +
+      provinces.map(p => `<option>${p}</option>`).join('');
+    muniSel.innerHTML = '<option value="">Select Municipality</option>';
+  };
+
+  provSel.onchange = () => {
+    const province = provSel.value;
+    const munis = loc.municipalities[province] || [];
+    muniSel.innerHTML = '<option value="">Select Municipality</option>' +
+      munis.map(m => `<option>${m}</option>`).join('');
+  };
+}
+
+document.getElementById('supportLevel').addEventListener('change', e => {
+  const level = e.target.value;
+  const region = document.getElementById('region');
+  const province = document.getElementById('province');
+  const municipality = document.getElementById('municipality');
+
+  region.classList.add('hidden');
+  province.classList.add('hidden');
+  municipality.classList.add('hidden');
+
+  if (level === 'MPMO Support') {
+    region.classList.remove('hidden');
+    province.classList.remove('hidden');
+    municipality.classList.remove('hidden');
+  } else if (level === 'Provincial Support') {
+    region.classList.remove('hidden');
+    province.classList.remove('hidden');
+  } else if (level === 'Regional Support') {
+    region.classList.remove('hidden');
+  } // NPMO has none
+});
+
+document.getElementById('ticketForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const status = document.getElementById('status');
+  status.style.color = 'black';
+  status.textContent = 'Submitting...';
+
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd.entries());
+
+  const files = document.getElementById('files').files;
+  data.files = [];
+  for (const file of files) {
+    const base64 = await toBase64(file);
+    data.files.push({ name: file.name, data: base64 });
   }
 
-  document.getElementById('ticketForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const status = document.getElementById('status');
-    status.style.color = 'black';
-    status.textContent = 'Submitting...';
-
-    const fd = new FormData(e.target);
-    const data = Object.fromEntries(fd.entries());
-
-    const files = document.getElementById('files').files;
-    data.files = [];
-    for (const file of files) {
-      const base64 = await toBase64(file);
-      data.files.push({ name: file.name, data: base64 });
-    }
-
-    try {
-      const res = await fetch(backendUrl, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const json = await res.json();
-      if (json.status === 'success') {
-        status.style.color = 'green';
-        status.textContent = `✅ Ticket submitted successfully! ID: ${json.ticketId}`;
-        e.target.reset();
-      } else throw new Error(json.message);
-    } catch (err) {
-      status.style.color = 'red';
-      status.textContent = `❌ Error: ${err.message}`;
-    }
-  });
-
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  try {
+    const res = await fetch(backendUrl, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
     });
+    const json = await res.json();
+    if (json.status === 'success') {
+      status.style.color = 'green';
+      status.textContent = `✅ Ticket submitted successfully! ID: ${json.ticketId}`;
+      e.target.reset();
+    } else throw new Error(json.message);
+  } catch (err) {
+    status.style.color = 'red';
+    status.textContent = `❌ Error: ${err.message}`;
   }
+});
 
-  document.addEventListener('DOMContentLoaded', loadLocations);
-  </script>
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadLocations);
+</script>
 </body>
 </html>
