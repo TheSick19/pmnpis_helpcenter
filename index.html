@@ -143,6 +143,44 @@ button:hover { background: #0056b3; }
     }
 
     window.onload = loadLocations;
+
+  function populateDropdowns(data) {
+  const regions = [...new Set(data.map(d => d.region))].filter(Boolean);
+  const regionSelect = document.getElementById('region');
+  const provinceSelect = document.getElementById('province');
+  const muniSelect = document.getElementById('municipality');
+
+  regionSelect.innerHTML =
+    `<option value="">Select Region</option>` +
+    regions.map(r => `<option value="${r}">${r}</option>`).join('');
+
+  regionSelect.onchange = () => {
+    const selectedRegion = regionSelect.value;
+    const provinces = [...new Set(data
+      .filter(d => d.region === selectedRegion)
+      .map(d => d.province)
+    )].filter(Boolean);
+
+    provinceSelect.innerHTML =
+      `<option value="">Select Province</option>` +
+      provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+
+    muniSelect.innerHTML = `<option value="">Select Municipality</option>`;
+  };
+
+  provinceSelect.onchange = () => {
+    const selectedProvince = provinceSelect.value;
+    const municipalities = data
+      .filter(d => d.province === selectedProvince)
+      .map(d => d.municipality)
+      .filter(Boolean);
+
+    muniSelect.innerHTML =
+      `<option value="">Select Municipality</option>` +
+      municipalities.map(m => `<option value="${m}">${m}</option>`).join('');
+  };
+}
+
   </script>
 </body>
 </html>
