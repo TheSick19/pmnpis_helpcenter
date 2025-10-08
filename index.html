@@ -87,101 +87,62 @@ button:hover { background: #0056b3; }
 </form>
 
 <script>
-const backendUrl = 'https://script.google.com/macros/s/AKfycbz9JEI6cgFot1J-50e31FMyB5RUX0gr8O2J1ZozosMTDjohITsx1b8QyhoS2REgJRlv/exec';
+    const backendUrl = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
-async function loadLocations() {
-  const res = await fetch(`${backendUrl}?action=getLocations`);
-  const loc = await res.json();
+    async function loadLocations() {
+      try {
+        const res = await fetch(`${backendUrl}?action=getLocations`);
+        const data = await res.json();
+        console.log(data);
+        if (data.status === 'success') populateDropdowns(data.data);
+      } catch (err) {
+        console.error('❌ Location load error:', err);
+      }
+    }
 
-  const regionSel = document.getElementById('region');
-  const provSel = document.getElementById('province');
-  const muniSel = document.getElementById('municipality');
+    function populateDropdowns(data) {
+      const regions = [...new Set(data.map(d => d.region))].filter(Boolean);
+      const regionSelect = document.getElementById('region');
+      regionSelect.innerHTML =
+        `<option value="">Select Region</option>` +
+        regions.map(r => `<option value="${r}">${r}</option>`).join('');
+    }
 
-  regionSel.innerHTML = '<option value="">Select Region</option>' +
-    loc.regions.map(r => `<option>${r}</option>`).join('');
+    async function submitForm(e) {
+      e.preventDefault();
+      const formData = collectFormData();
+      try {
+        const res = await fetch(backendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          alert(`✅ Submitted! Ticket ID: ${data.ticketId}`);
+        } else {
+          alert(`❌ ${data.message}`);
+        }
+      } catch (err) {
+        alert(`❌ Failed to submit: ${err.message}`);
+      }
+    }
 
-  regionSel.onchange = () => {
-    const region = regionSel.value;
-    const provinces = loc.provinces[region] || [];
-    provSel.innerHTML = '<option value="">Select Province</option>' +
-      provinces.map(p => `<option>${p}</option>`).join('');
-    muniSel.innerHTML = '<option value="">Select Municipality</option>';
-  };
+    function collectFormData() {
+      return {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        position: document.getElementById('position').value,
+        supportLevel: document.getElementById('supportLevel').value,
+        region: document.getElementById('region').value,
+        province: document.getElementById('province').value,
+        municipality: document.getElementById('municipality').value,
+        category: document.getElementById('category').value,
+        description: document.getElementById('description').value
+      };
+    }
 
-  provSel.onchange = () => {
-    const province = provSel.value;
-    const munis = loc.municipalities[province] || [];
-    muniSel.innerHTML = '<option value="">Select Municipality</option>' +
-      munis.map(m => `<option>${m}</option>`).join('');
-  };
-}
-
-document.getElementById('supportLevel').addEventListener('change', e => {
-  const level = e.target.value;
-  const region = document.getElementById('region');
-  const province = document.getElementById('province');
-  const municipality = document.getElementById('municipality');
-
-  region.classList.add('hidden');
-  province.classList.add('hidden');
-  municipality.classList.add('hidden');
-
-  if (level === 'MPMO Support') {
-    region.classList.remove('hidden');
-    province.classList.remove('hidden');
-    municipality.classList.remove('hidden');
-  } else if (level === 'Provincial Support') {
-    region.classList.remove('hidden');
-    province.classList.remove('hidden');
-  } else if (level === 'Regional Support') {
-    region.classList.remove('hidden');
-  } // NPMO has none
-});
-
-document.getElementById('ticketForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const status = document.getElementById('status');
-  status.style.color = 'black';
-  status.textContent = 'Submitting...';
-
-  const fd = new FormData(e.target);
-  const data = Object.fromEntries(fd.entries());
-
-  const files = document.getElementById('files').files;
-  data.files = [];
-  for (const file of files) {
-    const base64 = await toBase64(file);
-    data.files.push({ name: file.name, data: base64 });
-  }
-
-  try {
-    const res = await fetch(backendUrl, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const json = await res.json();
-    if (json.status === 'success') {
-      status.style.color = 'green';
-      status.textContent = `✅ Ticket submitted successfully! ID: ${json.ticketId}`;
-      e.target.reset();
-    } else throw new Error(json.message);
-  } catch (err) {
-    status.style.color = 'red';
-    status.textContent = `❌ Error: ${err.message}`;
-  }
-});
-
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', loadLocations);
-</script>
+    window.onload = loadLocations;
+  </script>
 </body>
 </html>
