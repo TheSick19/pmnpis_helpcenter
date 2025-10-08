@@ -142,7 +142,7 @@ button:hover { background: #0056b3; }
       };
     }
 
-    window.onload = loadLocations;
+  
 
   function populateDropdowns(data) {
   const regions = [...new Set(data.map(d => d.region))].filter(Boolean);
@@ -180,7 +180,7 @@ button:hover { background: #0056b3; }
       municipalities.map(m => `<option value="${m}">${m}</option>`).join('');
   };
 }
-
+  window.onload = loadLocations;
   </script>
 </body>
 </html>
