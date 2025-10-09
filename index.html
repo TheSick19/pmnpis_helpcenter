@@ -3,278 +3,234 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PMNPIS Help Center Ticketing System</title>
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background: #f5f6fa;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 700px;
-      background: #fff;
-      margin: 3rem auto;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #0066cc;
-      margin-bottom: 1.5rem;
-    }
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-    button {
-      width: 100%;
-      background: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 0.9rem;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    button:hover { background: #004c99; }
-    #status {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
-    .hidden { display: none; }
-  </style>
+  <title>PMNP-IS Help Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container">
-    <h2>PMNPIS Help Center Ticket Form</h2>
-    <form id="ticketForm">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input id="name" required />
+
+<style>
+  input, select, textarea {
+    width: 100%;
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem;     /* rounded-lg */
+    padding: 0.5rem 0.75rem;   /* px-3 py-2 */
+    background-color: white;
+    color: #1f2937;            /* gray-800 */
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #3b82f6;     /* blue-500 */
+    box-shadow: 0 0 0 2px #bfdbfe; /* ring-blue-200 */
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #374151; /* gray-700 */
+    font-size: 0.875rem;
+  }
+</style>
+
+
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-6">
+    <div class="text-center mb-6">
+      <div class="flex justify-center mb-2">
+        <div class="bg-blue-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center">PM</div>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">PMNP-IS Help Center</h1>
+      <p class="text-gray-500 text-sm">Submit a support ticket</p>
+    </div>
+
+    <form id="ticketForm" class="space-y-4">
+      <div class="mb-4">
+        <label class="block font-medium">Full Name</label>
+        <input type="text" id="name" name="name" required
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
       </div>
 
-      <div class="form-group">
-        <label>Email Address</label>
-        <input id="email" type="email" required />
+      <div>
+        <label class="block font-medium">Email</label>
+        <input type="email" id="email" name="email" required
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
       </div>
 
-      <div class="form-group">
-        <label>Position</label>
-        <input id="position" required />
-      </div>
-
-      <div class="form-group">
-        <label>Support Level</label>
-        <select id="supportLevel" required>
-          <option value="">Select Support Level</option>
+      <div>
+        <label class="block font-medium">Concern Type</label>
+        <select id="concern" name="concern" required
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Select Concern Type</option>
           <option value="MPMO Support">MPMO Support</option>
           <option value="Provincial Support">Provincial Support</option>
           <option value="Regional Support">Regional Support</option>
-          <option value="NPMO Technical Workstreams">NPMO Technical Workstreams</option>
+          <option value="NPMO">NPMO Technical Workstreams</option>
+          <option value="Other">Other</option>
         </select>
       </div>
 
-      <div class="form-group" id="region-group" class="hidden">
-        <label>Region</label>
-        <select id="region"></select>
+      <!-- Dynamic Region / Province / Municipality -->
+      <div id="regionWrapper" class="hidden">
+        <label class="block font-medium">Region</label>
+        <select id="region" name="region"
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></select>
       </div>
 
-      <div class="form-group" id="province-group" class="hidden">
-        <label>Province</label>
-        <select id="province"></select>
+      <div id="provinceWrapper" class="hidden">
+        <label class="block font-medium mt-2">Province</label>
+        <select id="province" name="province"
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></select>
       </div>
 
-      <div class="form-group" id="municipality-group" class="hidden">
-        <label>Municipality</label>
-        <select id="municipality"></select>
+      <div id="municipalityWrapper" class="hidden">
+        <label class="block font-medium mt-2">Municipality</label>
+        <select id="municipality" name="municipality"
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></select>
       </div>
 
-      <div class="form-group">
-        <label>Category</label>
-        <select id="category" required>
-          <option value="">Select Category</option>
-          <option>HCSC Questions/Masterlists</option>
-          <option>UI/UX</option>
-          <option>User Accounts</option>
-          <option>Additional Features</option>
-          <option>Formula and Logics</option>
-          <option>User Role and Access</option>
-          <option>Functionality Errors</option>
-          <option>Backend</option>
-          <option>Dashboards, Reports and Line List</option>
-          <option>Formats</option>
-          <option>Job Aids</option>
-        </select>
+      <div>
+        <label class="block font-medium">Description</label>
+        <textarea id="description" name="description" rows="4" required
+          class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
       </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="description" required></textarea>
+      <div>
+        <label class="block font-medium">Attachment (optional)</label>
+        <input type="file" id="file" name="files" multiple
+          class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+          file:rounded-full file:border-0 file:text-sm file:font-semibold
+          file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
       </div>
 
-      <div class="form-group">
-        <label>Attachments</label>
-        <input type="file" id="files" multiple />
-      </div>
+      <button type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg">
+        Submit Ticket
+      </button>
 
-      <button type="submit">Submit Ticket</button>
-      <div id="status"></div>
+      <p id="statusMsg" class="text-center text-sm text-gray-500 mt-2"></p>
     </form>
   </div>
 
   <script>
-  const backendUrl = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
-  let locationData = [];
+    const scriptURL = "YOUR_APPS_SCRIPT_EXEC_URL"; // 🔗 Replace this with your deployed Apps Script Web App URL
 
-  // --- Load PSGC data ---
-  async function loadLocations() {
-    try {
-      const res = await fetch(`${backendUrl}?action=getLocations`);
-      const data = await res.json();
-      if (data.status === "success" && Array.isArray(data.data)) {
-        locationData = data.data;
-        console.log("✅ Loaded locations:", locationData.length);
-      }
-    } catch (err) {
-      console.error("❌ Failed to load locations:", err);
-    }
-  }
-
-  // --- Populate cascading dropdowns ---
-  function populateDropdowns() {
-    const regionSel = document.getElementById("region");
-    const provinceSel = document.getElementById("province");
-    const muniSel = document.getElementById("municipality");
-
-    const regions = [...new Set(locationData.map(d => d.region))].filter(Boolean);
-    regionSel.innerHTML = `<option value="">Select Region</option>` +
-      regions.map(r => `<option>${r}</option>`).join("");
-
-    regionSel.onchange = () => {
-      const selected = regionSel.value;
-      const provinces = [...new Set(locationData.filter(d => d.region === selected).map(d => d.province))].filter(Boolean);
-      provinceSel.innerHTML = `<option value="">Select Province</option>` +
-        provinces.map(p => `<option>${p}</option>`).join("");
-      muniSel.innerHTML = `<option value="">Select Municipality</option>`;
-    };
-
-    provinceSel.onchange = () => {
-      const selected = provinceSel.value;
-      const munis = locationData.filter(d => d.province === selected).map(d => d.municipality).filter(Boolean);
-      muniSel.innerHTML = `<option value="">Select Municipality</option>` +
-        munis.map(m => `<option>${m}</option>`).join("");
-    };
-  }
-
-  // --- Show/hide org fields based on support level ---
-  function setupSupportLogic() {
-    const regionGroup = document.getElementById("region-group");
-    const provinceGroup = document.getElementById("province-group");
-    const municipalityGroup = document.getElementById("municipality-group");
-    const support = document.getElementById("supportLevel");
-
-    regionGroup.style.display = "none";
-    provinceGroup.style.display = "none";
-    municipalityGroup.style.display = "none";
-
-    support.addEventListener("change", () => {
-      const val = support.value;
-      regionGroup.style.display = "none";
-      provinceGroup.style.display = "none";
-      municipalityGroup.style.display = "none";
-
-      if (val === "MPMO Support") {
-        regionGroup.style.display = "block";
-        provinceGroup.style.display = "block";
-        municipalityGroup.style.display = "block";
-      } else if (val === "Provincial Support") {
-        regionGroup.style.display = "block";
-        provinceGroup.style.display = "block";
-      } else if (val === "Regional Support") {
-        regionGroup.style.display = "block";
-      }
-    });
-  }
-
-  // --- Convert file to Base64 ---
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  // --- Form submission ---
-  async function submitForm(e) {
-    e.preventDefault();
-    const status = document.getElementById("status");
-    status.style.color = "black";
-    status.textContent = "Submitting...";
-
-    const files = document.getElementById("files").files;
-    const uploads = [];
-    for (const file of files) {
-      const base64 = await toBase64(file);
-      uploads.push({ name: file.name, data: base64 });
-    }
-
-    const data = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      position: document.getElementById("position").value,
-      supportLevel: document.getElementById("supportLevel").value,
-      region: document.getElementById("region").value,
-      province: document.getElementById("province").value,
-      municipality: document.getElementById("municipality").value,
-      category: document.getElementById("category").value,
-      description: document.getElementById("description").value,
-      files: uploads
-    };
-
-    try {
-      const res = await fetch(backendUrl, {
-        method: "POST",
-        mode: "no-cors", // prevents CORS errors
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+    // --- Load regionData.json for dropdowns ---
+    let psgcData = {};
+    fetch("regionData.json")
+      .then((res) => res.json())
+      .then((data) => {
+        psgcData = data;
+        populateRegions();
       });
 
-      status.style.color = "green";
-      status.textContent = "✅ Ticket submitted successfully!";
-      e.target.reset();
-    } catch (err) {
-      status.style.color = "red";
-      status.textContent = `❌ Failed: ${err.message}`;
-    }
-  }
+    const regionSelect = document.getElementById("region");
+    const provinceSelect = document.getElementById("province");
+    const muniSelect = document.getElementById("municipality");
 
-  window.onload = async () => {
-    await loadLocations();
-    populateDropdowns();
-    setupSupportLogic();
-    document.getElementById("ticketForm").addEventListener("submit", submitForm);
-  };
+    function populateRegions() {
+      regionSelect.innerHTML = `<option value="">Select Region</option>`;
+      Object.keys(psgcData).forEach(region => {
+        regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+      });
+    }
+
+    regionSelect.addEventListener("change", () => {
+      const selectedRegion = regionSelect.value;
+      provinceSelect.innerHTML = `<option value="">Select Province</option>`;
+      muniSelect.innerHTML = `<option value="">Select Municipality</option>`;
+
+      if (selectedRegion && psgcData[selectedRegion]) {
+        Object.keys(psgcData[selectedRegion]).forEach(province => {
+          provinceSelect.innerHTML += `<option value="${province}">${province}</option>`;
+        });
+      }
+    });
+
+    provinceSelect.addEventListener("change", () => {
+      const selectedRegion = regionSelect.value;
+      const selectedProvince = provinceSelect.value;
+      muniSelect.innerHTML = `<option value="">Select Municipality</option>`;
+
+      if (selectedRegion && selectedProvince && psgcData[selectedRegion][selectedProvince]) {
+        psgcData[selectedRegion][selectedProvince].forEach(muni => {
+          muniSelect.innerHTML += `<option value="${muni}">${muni}</option>`;
+        });
+      }
+    });
+
+    // --- Concern Type Logic (your requested rules) ---
+    const concernSelect = document.getElementById("concern");
+    const regionWrapper = document.getElementById("regionWrapper");
+    const provinceWrapper = document.getElementById("provinceWrapper");
+    const municipalityWrapper = document.getElementById("municipalityWrapper");
+
+    concernSelect.addEventListener("change", () => {
+      const selected = concernSelect.value;
+
+      // Hide all by default
+      regionWrapper.classList.add("hidden");
+      provinceWrapper.classList.add("hidden");
+      municipalityWrapper.classList.add("hidden");
+
+      // Reset dropdowns
+      regionSelect.value = "";
+      provinceSelect.value = "";
+      muniSelect.value = "";
+
+      // Conditional visibility
+      if (selected === "MPMO Support") {
+        regionWrapper.classList.remove("hidden");
+        provinceWrapper.classList.remove("hidden");
+        municipalityWrapper.classList.remove("hidden");
+      } else if (selected === "Provincial Support") {
+        regionWrapper.classList.remove("hidden");
+        provinceWrapper.classList.remove("hidden");
+      } else if (selected === "Regional Support") {
+        regionWrapper.classList.remove("hidden");
+      }
+    });
+
+    // --- Submit form ---
+    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData();
+
+// Append all non-file inputs
+[...form.elements].forEach(el => {
+  if (el.name && el.type !== "file") {
+    formData.append(el.name, el.value);
+  }
+});
+
+// Append multiple files
+const fileInput = document.getElementById("file");
+if (fileInput.files.length > 0) {
+  for (const file of fileInput.files) {
+    formData.append("files[]", file);
+  }
+}
+
+const res = await fetch(scriptURL, { method: "POST", body: formData });
+      const statusMsg = document.getElementById("statusMsg");
+
+
+
+      statusMsg.textContent = "Submitting...";
+      try {
+        const res = await fetch(scriptURL, { method: "POST", body: formData });
+        const result = await res.json();
+        if (result.status === "success") {
+          statusMsg.textContent = `✅ Ticket submitted! Reference: ${result.ticketId}`;
+          form.reset();
+        } else {
+          statusMsg.textContent = "❌ Error submitting ticket. Please try again.";
+        }
+      } catch (err) {
+        statusMsg.textContent = "⚠️ Network error. Please check your connection.";
+      }
+    });
   </script>
 </body>
 </html>
