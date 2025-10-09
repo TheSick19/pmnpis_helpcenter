@@ -92,7 +92,7 @@
 
   <script>
     // ← Replace with your published Apps Script web app URL (deployed as "Anyone")
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwendR7iuDkVotpTOPxwZGdZByHIZ3b5a3T2H0USNnSRcbGorvX-24HOKDU3f13wfqY/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzgG0-tFP_ZelXrAS1RCfHw4EfiWgnHg7Lo7VR4DUHOfaQS_pXEE91xwAo-8Dghmo1k/exec";
 
     // regionData.json loader (unchanged)
     let regionData = {};
@@ -145,58 +145,69 @@
       }
     });
 
-    // ----- IMPORTANT: replace fetch() with XHR and append individual file keys -----
-    document.getElementById('ticketForm').addEventListener('submit', function(ev) {
-      ev.preventDefault();
-      const form = ev.target;
-      const toast = document.getElementById('toast');
-      toast.classList.add('hidden');
-      toast.textContent = '';
+    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const formData = new FormData();
+    const toast = document.getElementById("toast");
+    toast.classList.add("hidden");
+    toast.textContent = "";
 
-      // append text fields (use same names the backend expects)
-      const fields = ['name','email','cc','supportLevel','region','province','municipality','category','message'];
-      fields.forEach(k => {
-        const el = form.querySelector(`[name="${k}"]`);
-        if (el) formData.append(k, el.value || '');
+    const form = e.target;
+    const filesInput = document.getElementById("filesInput");
+
+    const payload = {
+      name: form.name.value,
+      email: form.email.value,
+      cc: form.cc.value,
+      supportLevel: form.supportLevel.value,
+      region: form.region.value,
+      province: form.province.value,
+      municipality: form.municipality.value,
+      category: form.category.value,
+      message: form.message.value,
+      files: [],
+    };
+
+    // convert attachments to base64
+    const files = filesInput.files;
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      const base64 = await fileToBase64(f);
+      payload.files.push({
+        name: f.name,
+        type: f.type,
+        data: base64,
       });
+    }
 
-      // append files individually as file0,file1,... so Apps Script will receive them reliably
-      const filesInput = document.getElementById('filesInput');
-      if (filesInput && filesInput.files && filesInput.files.length) {
-        Array.from(filesInput.files).forEach((f, i) => {
-          formData.append(`file${i+1}`, f, f.name);
-        });
-      }
-
-      // XHR request (more reliable cross-browser for multipart -> Apps Script)
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', scriptURL, true);
-      xhr.onload = function() {
-        let result = null;
-        try { result = JSON.parse(xhr.responseText); } catch (e) { result = null; }
-        if (xhr.status >= 200 && xhr.status < 300 && result && result.success) {
-          toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
-          toast.classList.remove('hidden');
-          form.reset();
-        } else {
-          const msg = (result && result.error) ? result.error : 'Server error or invalid response';
-          toast.textContent = `❌ ${msg}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-          toast.classList.remove('hidden');
-          console.error('XHR result', xhr.status, xhr.responseText);
-        }
-      };
-      xhr.onerror = function(err) {
-        toast.textContent = '❌ Network error — check console';
-        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-        toast.classList.remove('hidden');
-        console.error('XHR error', err);
-      };
-      xhr.send(formData);
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
     });
+
+    const result = await res.json();
+
+    if (result.success) {
+      toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
+      toast.classList.remove("hidden");
+      form.reset();
+    } else {
+      toast.textContent = `❌ ${result.error}`;
+      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
+      toast.classList.remove("hidden");
+    }
+  });
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  }
   </script>
 </body>
 </html>
