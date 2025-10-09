@@ -8,13 +8,13 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center">
   <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl">
-  <div class="flex justify-center mb-4">
-  <img src="logo.png" alt="PMNP-IS Logo" class="h-16 w-auto" />
-  </div>
-    
+    <div class="flex justify-center mb-4">
+      <img src="logo.png" alt="PMNP-IS Logo" class="h-16 w-auto" />
+    </div>
+
     <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">PMNP-IS Help Center</h1>
 
-    <form id="ticketForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form id="ticketForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" enctype="multipart/form-data">
       <div class="col-span-2">
         <label class="block text-sm font-semibold">Full Name</label>
         <input type="text" name="name" required class="w-full border rounded-md p-2" />
@@ -62,8 +62,8 @@
           <option value="">Select Category</option>
           <option value="HCSC Questions/Masterlists">HCSC Questions/Masterlists</option>
           <option value="UI/UX">UI/UX</option>
-          <option value="NPMO Support">User Role and Access</option>
-          <option value="User Role and Access">Functionality Errors</option>
+          <option value="User Role and Access">User Role and Access</option>
+          <option value="Functionality Errors">Functionality Errors</option>
           <option value="Backend">Backend</option>
           <option value="Dashboards, Reports and Line List">Dashboards, Reports and Line List</option>
         </select>
@@ -76,7 +76,7 @@
 
       <div class="col-span-2">
         <label class="block text-sm font-semibold">Attachments (optional)</label>
-        <input type="file" name="files" multiple class="w-full border rounded-md p-2" />
+        <input type="file" name="files" id="files" multiple class="w-full border rounded-md p-2" />
       </div>
 
       <div class="col-span-2 text-center mt-4">
@@ -88,7 +88,7 @@
   </div>
 
   <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbzrHKojFVI3LjCilYv6SXYq6MZqHbABIbYpxicvEQVhjMUGk3rZWw9r_UUmX0BvtPWn/exec"; // <-- Replace with your Apps Script Web App URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbzrHKojFVI3LjCilYv6SXYq6MZqHbABIbYpxicvEQVhjMUGk3rZWw9r_UUmX0BvtPWn/exec";
 
 const supportSelect = document.getElementById("supportLevel");
 const regionWrapper = document.getElementById("regionWrapper");
@@ -135,7 +135,7 @@ provinceSelect.addEventListener("change", () => {
   }
 });
 
-// --- Suport Level visibility logic ---
+// --- Support Level visibility logic ---
 supportSelect.addEventListener("change", () => {
   const selected = supportSelect.value;
   regionWrapper.classList.add("hidden");
@@ -154,21 +154,29 @@ supportSelect.addEventListener("change", () => {
   }
 });
 
-// --- Form submission ---
+// --- Form submission (fixed file upload) ---
 document.getElementById("ticketForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
   const formData = new FormData(form);
 
   try {
-    const response = await fetch(scriptURL, { method: "POST", body: formData });
-    const result = await response.json();
+    const response = await fetch(scriptURL, {
+      method: "POST",
+      body: formData,
+      headers: { "Accept": "application/json" }, // ensure JSON response
+    });
+
+    // Text fallback in case the server returns plain text
+    const text = await response.text();
+    let result = {};
+    try { result = JSON.parse(text); } catch { result = { success: false, error: text }; }
 
     if (result.success) {
       showToast(`✅ Ticket submitted successfully! ID: ${result.ticketId}`, "bg-green-600");
       form.reset();
     } else {
-      showToast(`❌ ${result.error}`, "bg-red-600");
+      showToast(`❌ ${result.error || "Error submitting ticket."}`, "bg-red-600");
     }
   } catch (error) {
     console.error(error);
@@ -184,6 +192,5 @@ function showToast(msg, color) {
   setTimeout(() => toast.classList.add("hidden"), 4000);
 }
 </script>
-
 </body>
 </html>
