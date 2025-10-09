@@ -91,112 +91,114 @@
   </div>
 
   <script>
-    // ← Replace with your published Apps Script web app URL (deployed as "Anyone")
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxsR3CFUHigsWCepFyVEDNsCgvXuvzIy0TIWQmx-mZq3nUa2sjz4oHrzWzhpyk-yoTK/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwoFvyW4N3kXnALjAgABee8tmU6fcV6ErahhNmxdTx4PmYwZMn_KSQwcq02vEqREj-t/exec";
 
-    // regionData.json loader (unchanged)
-    let regionData = {};
-    (async function loadRegions(){
-      try {
-        const r = await fetch('regionData.json');
-        regionData = await r.json();
-        const regionSel = document.getElementById('region');
-        regionSel.innerHTML = '<option value="">Select Region</option>';
-        Object.keys(regionData).forEach(k => {
-          regionSel.innerHTML += `<option value="${k}">${k}</option>`;
-        });
-      } catch(e) { console.warn('region load failed', e); }
-    })();
-
-    const supportSelect = document.getElementById("supportLevel");
-    const regionWrapper = document.getElementById("regionWrapper");
-    const provinceWrapper = document.getElementById("provinceWrapper");
-    const municipalityWrapper = document.getElementById("municipalityWrapper");
-
-    document.getElementById('region').addEventListener('change', () => {
-      const region = document.getElementById('region').value;
-      const provSel = document.getElementById('province');
-      provSel.innerHTML = '<option value="">Select Province</option>';
-      document.getElementById('municipality').innerHTML = '<option value="">Select Municipality</option>';
-      if (regionData[region]) Object.keys(regionData[region]).forEach(p=> provSel.innerHTML += `<option value="${p}">${p}</option>`);
-    });
-
-    document.getElementById('province').addEventListener('change', () => {
-      const region = document.getElementById('region').value;
-      const province = document.getElementById('province').value;
-      const muniSel = document.getElementById('municipality');
-      muniSel.innerHTML = '<option value="">Select Municipality</option>';
-      if (regionData[region] && regionData[region][province]) {
-        regionData[region][province].forEach(m=> muniSel.innerHTML += `<option value="${m}">${m}</option>`);
-      }
-    });
-
-    supportSelect.addEventListener('change', () => {
-      const val = supportSelect.value;
-      regionWrapper.classList.add('hidden');
-      provinceWrapper.classList.add('hidden');
-      municipalityWrapper.classList.add('hidden');
-      if (val === 'MPMO Support') {
-        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden'); municipalityWrapper.classList.remove('hidden');
-      } else if (val === 'Provincial Support') {
-        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden');
-      } else if (val === 'Regional Support') {
-        regionWrapper.classList.remove('hidden');
-      }
-    });
-
-    // ----- IMPORTANT: replace fetch() with XHR and append individual file keys -----
-    document.getElementById('ticketForm').addEventListener('submit', function(ev) {
-      ev.preventDefault();
-      const form = ev.target;
-      const toast = document.getElementById('toast');
-      toast.classList.add('hidden');
-      toast.textContent = '';
-
-      const formData = new FormData();
-
-      // append text fields (use same names the backend expects)
-      const fields = ['name','email','cc','supportLevel','region','province','municipality','category','message'];
-      fields.forEach(k => {
-        const el = form.querySelector(`[name="${k}"]`);
-        if (el) formData.append(k, el.value || '');
+  let regionData = {};
+  (async function loadRegions() {
+    try {
+      const r = await fetch("regionData.json");
+      regionData = await r.json();
+      const regionSel = document.getElementById("region");
+      regionSel.innerHTML = '<option value="">Select Region</option>';
+      Object.keys(regionData).forEach(k => {
+        regionSel.innerHTML += `<option value="${k}">${k}</option>`;
       });
+    } catch (e) { console.warn("region load failed", e); }
+  })();
 
-      // append files individually as file0,file1,... so Apps Script will receive them reliably
-      const filesInput = document.getElementById('filesInput');
-      if (filesInput && filesInput.files && filesInput.files.length) {
-        Array.from(filesInput.files).forEach((f, i) => {
-          formData.append(`file${i+1}`, f, f.name);
-        });
+  const supportSelect = document.getElementById("supportLevel");
+  const regionWrapper = document.getElementById("regionWrapper");
+  const provinceWrapper = document.getElementById("provinceWrapper");
+  const municipalityWrapper = document.getElementById("municipalityWrapper");
+
+  document.getElementById("region").addEventListener("change", () => {
+    const region = document.getElementById("region").value;
+    const provSel = document.getElementById("province");
+    provSel.innerHTML = '<option value="">Select Province</option>';
+    document.getElementById("municipality").innerHTML = '<option value="">Select Municipality</option>';
+    if (regionData[region]) Object.keys(regionData[region]).forEach(p => provSel.innerHTML += `<option value="${p}">${p}</option>`);
+  });
+
+  document.getElementById("province").addEventListener("change", () => {
+    const region = document.getElementById("region").value;
+    const province = document.getElementById("province").value;
+    const muniSel = document.getElementById("municipality");
+    muniSel.innerHTML = '<option value="">Select Municipality</option>';
+    if (regionData[region] && regionData[region][province]) {
+      regionData[region][province].forEach(m => muniSel.innerHTML += `<option value="${m}">${m}</option>`);
+    }
+  });
+
+  supportSelect.addEventListener("change", () => {
+    const val = supportSelect.value;
+    regionWrapper.classList.add("hidden");
+    provinceWrapper.classList.add("hidden");
+    municipalityWrapper.classList.add("hidden");
+    if (val === "MPMO Support") {
+      regionWrapper.classList.remove("hidden");
+      provinceWrapper.classList.remove("hidden");
+      municipalityWrapper.classList.remove("hidden");
+    } else if (val === "Provincial Support") {
+      regionWrapper.classList.remove("hidden");
+      provinceWrapper.classList.remove("hidden");
+    } else if (val === "Regional Support") {
+      regionWrapper.classList.remove("hidden");
+    }
+  });
+
+  // --------------------- SUBMISSION HANDLER ---------------------
+ document.getElementById("ticketForm").addEventListener("submit", function(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const toast = document.getElementById("toast");
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+  submitBtn.classList.add("opacity-70", "cursor-not-allowed");
+
+  const formData = new FormData();
+  const fields = ["name", "email", "cc", "supportLevel", "region", "province", "municipality", "category", "message"];
+  fields.forEach(k => {
+    const el = form.querySelector(`[name="${k}"]`);
+    if (el) formData.append(k, el.value || "");
+  });
+
+  const filesInput = document.getElementById("filesInput");
+  if (filesInput && filesInput.files && filesInput.files.length) {
+    Array.from(filesInput.files).forEach((f, i) => formData.append(`file${i + 1}`, f, f.name));
+  }
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", scriptURL, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Ticket";
+      submitBtn.classList.remove("opacity-70", "cursor-not-allowed");
+      let result = null;
+      try { result = JSON.parse(xhr.responseText); } catch {}
+      if (xhr.status === 200 && result && result.success) {
+        toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+        toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
+        toast.classList.remove("hidden");
+        form.reset();
+      } else {
+        toast.textContent = `❌ ${result?.error || "Upload failed"}`;
+        toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
+        toast.classList.remove("hidden");
+        console.error("Response:", xhr.responseText);
       }
-
-      // XHR request (more reliable cross-browser for multipart -> Apps Script)
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', scriptURL, true);
-      xhr.onload = function() {
-        let result = null;
-        try { result = JSON.parse(xhr.responseText); } catch (e) { result = null; }
-        if (xhr.status >= 200 && xhr.status < 300 && result && result.success) {
-          toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
-          toast.classList.remove('hidden');
-          form.reset();
-        } else {
-          const msg = (result && result.error) ? result.error : 'Server error or invalid response';
-          toast.textContent = `❌ ${msg}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-          toast.classList.remove('hidden');
-          console.error('XHR result', xhr.status, xhr.responseText);
-        }
-      };
-      xhr.onerror = function(err) {
-        toast.textContent = '❌ Network error — check console';
-        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-        toast.classList.remove('hidden');
-        console.error('XHR error', err);
-      };
-      xhr.send(formData);
-    });
+    }
+  };
+  xhr.onerror = err => {
+    toast.textContent = "❌ Network error — please try again.";
+    toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
+    toast.classList.remove("hidden");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Ticket";
+  };
+  xhr.send(formData);
+});
   </script>
 </body>
 </html>
