@@ -91,88 +91,112 @@
   </div>
 
   <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbyTMw3HbcHNBs7qOsJKiehy0k9ijtqE-VFLMOIBxdgou_A1ebZ2AJw58I-cFNJ5rK_C/exec";
+    // ← Replace with your published Apps Script web app URL (deployed as "Anyone")
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwknK2EPnXt9HepUYY9ht5SYEcNZJ5qH1utsE-iCCv7lYdyVlME6TSg0XwLAopHkWz6/exec";
 
-  let regionData = {};
-  (async function loadRegions() {
-    try {
-      const r = await fetch("regionData.json");
-      regionData = await r.json();
-      const regionSel = document.getElementById("region");
-      regionSel.innerHTML = '<option value="">Select Region</option>';
-      Object.keys(regionData).forEach(k => {
-        regionSel.innerHTML += `<option value="${k}">${k}</option>`;
-      });
-    } catch (e) { console.warn("region load failed", e); }
-  })();
+    // regionData.json loader (unchanged)
+    let regionData = {};
+    (async function loadRegions(){
+      try {
+        const r = await fetch('regionData.json');
+        regionData = await r.json();
+        const regionSel = document.getElementById('region');
+        regionSel.innerHTML = '<option value="">Select Region</option>';
+        Object.keys(regionData).forEach(k => {
+          regionSel.innerHTML += `<option value="${k}">${k}</option>`;
+        });
+      } catch(e) { console.warn('region load failed', e); }
+    })();
 
-  const supportSelect = document.getElementById("supportLevel");
-  const regionWrapper = document.getElementById("regionWrapper");
-  const provinceWrapper = document.getElementById("provinceWrapper");
-  const municipalityWrapper = document.getElementById("municipalityWrapper");
+    const supportSelect = document.getElementById("supportLevel");
+    const regionWrapper = document.getElementById("regionWrapper");
+    const provinceWrapper = document.getElementById("provinceWrapper");
+    const municipalityWrapper = document.getElementById("municipalityWrapper");
 
-  document.getElementById("region").addEventListener("change", () => {
-    const region = document.getElementById("region").value;
-    const provSel = document.getElementById("province");
-    provSel.innerHTML = '<option value="">Select Province</option>';
-    document.getElementById("municipality").innerHTML = '<option value="">Select Municipality</option>';
-    if (regionData[region]) Object.keys(regionData[region]).forEach(p => provSel.innerHTML += `<option value="${p}">${p}</option>`);
-  });
-
-  document.getElementById("province").addEventListener("change", () => {
-    const region = document.getElementById("region").value;
-    const province = document.getElementById("province").value;
-    const muniSel = document.getElementById("municipality");
-    muniSel.innerHTML = '<option value="">Select Municipality</option>';
-    if (regionData[region] && regionData[region][province]) {
-      regionData[region][province].forEach(m => muniSel.innerHTML += `<option value="${m}">${m}</option>`);
-    }
-  });
-
-  supportSelect.addEventListener("change", () => {
-    const val = supportSelect.value;
-    regionWrapper.classList.add("hidden");
-    provinceWrapper.classList.add("hidden");
-    municipalityWrapper.classList.add("hidden");
-    if (val === "MPMO Support") {
-      regionWrapper.classList.remove("hidden");
-      provinceWrapper.classList.remove("hidden");
-      municipalityWrapper.classList.remove("hidden");
-    } else if (val === "Provincial Support") {
-      regionWrapper.classList.remove("hidden");
-      provinceWrapper.classList.remove("hidden");
-    } else if (val === "Regional Support") {
-      regionWrapper.classList.remove("hidden");
-    }
-  });
-
-  // --------------------- SUBMISSION HANDLER ---------------------
-
-  const form = document.getElementById("ticketForm");
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(form);
-
-  try {
-    const response = await fetch(scriptURL, {
-      method: "POST",
-      body: formData, // ✅ no "no-cors"
+    document.getElementById('region').addEventListener('change', () => {
+      const region = document.getElementById('region').value;
+      const provSel = document.getElementById('province');
+      provSel.innerHTML = '<option value="">Select Province</option>';
+      document.getElementById('municipality').innerHTML = '<option value="">Select Municipality</option>';
+      if (regionData[region]) Object.keys(regionData[region]).forEach(p=> provSel.innerHTML += `<option value="${p}">${p}</option>`);
     });
 
-    const result = await response.json(); // parse server response
+    document.getElementById('province').addEventListener('change', () => {
+      const region = document.getElementById('region').value;
+      const province = document.getElementById('province').value;
+      const muniSel = document.getElementById('municipality');
+      muniSel.innerHTML = '<option value="">Select Municipality</option>';
+      if (regionData[region] && regionData[region][province]) {
+        regionData[region][province].forEach(m=> muniSel.innerHTML += `<option value="${m}">${m}</option>`);
+      }
+    });
 
-    if (result.success) {
-      alert("✅ Ticket saved successfully!");
-      form.reset();
-    } else {
-      alert("⚠️ Failed to save: " + (result.error || "Unknown error"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("❌ Network or server error: " + err.message);
-  }
-});
+    supportSelect.addEventListener('change', () => {
+      const val = supportSelect.value;
+      regionWrapper.classList.add('hidden');
+      provinceWrapper.classList.add('hidden');
+      municipalityWrapper.classList.add('hidden');
+      if (val === 'MPMO Support') {
+        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden'); municipalityWrapper.classList.remove('hidden');
+      } else if (val === 'Provincial Support') {
+        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden');
+      } else if (val === 'Regional Support') {
+        regionWrapper.classList.remove('hidden');
+      }
+    });
+
+    // ----- IMPORTANT: replace fetch() with XHR and append individual file keys -----
+    document.getElementById('ticketForm').addEventListener('submit', function(ev) {
+      ev.preventDefault();
+      const form = ev.target;
+      const toast = document.getElementById('toast');
+      toast.classList.add('hidden');
+      toast.textContent = '';
+
+      const formData = new FormData();
+
+      // append text fields (use same names the backend expects)
+      const fields = ['name','email','cc','supportLevel','region','province','municipality','category','message'];
+      fields.forEach(k => {
+        const el = form.querySelector(`[name="${k}"]`);
+        if (el) formData.append(k, el.value || '');
+      });
+
+      // append files individually as file0,file1,... so Apps Script will receive them reliably
+      const filesInput = document.getElementById('filesInput');
+      if (filesInput && filesInput.files && filesInput.files.length) {
+        Array.from(filesInput.files).forEach((f, i) => {
+          formData.append(`file${i+1}`, f, f.name);
+        });
+      }
+
+      // XHR request (more reliable cross-browser for multipart -> Apps Script)
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', scriptURL, true);
+      xhr.onload = function() {
+        let result = null;
+        try { result = JSON.parse(xhr.responseText); } catch (e) { result = null; }
+        if (xhr.status >= 200 && xhr.status < 300 && result && result.success) {
+          toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
+          toast.classList.remove('hidden');
+          form.reset();
+        } else {
+          const msg = (result && result.error) ? result.error : 'Server error or invalid response';
+          toast.textContent = `❌ ${msg}`;
+          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
+          toast.classList.remove('hidden');
+          console.error('XHR result', xhr.status, xhr.responseText);
+        }
+      };
+      xhr.onerror = function(err) {
+        toast.textContent = '❌ Network error — check console';
+        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
+        toast.classList.remove('hidden');
+        console.error('XHR error', err);
+      };
+      xhr.send(formData);
+    });
   </script>
 </body>
 </html>
