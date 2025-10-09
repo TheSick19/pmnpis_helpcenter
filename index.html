@@ -91,7 +91,7 @@
   </div>
 
   <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxMV50h6B2v8jmhcxpEIDn4RIM5Pyh7Vq8nvmd4mjX2mg3AeAeUlFXJJOk-rdpHK8TB/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwf5yGsiUGKY8_DkNw3lO3T3LBHfa0NaEFgLCEMg10FH8c7DBD1Blr7mmFgY3zy8f2-/exec";
 
   let regionData = {};
   (async function loadRegions() {
@@ -147,45 +147,31 @@
   });
 
   // --------------------- SUBMISSION HANDLER ---------------------
-document.getElementById("ticketForm").addEventListener("submit", async function(ev) {
-  ev.preventDefault();
-  const form = ev.target;
-  const toast = document.getElementById("toast");
-  const submitBtn = form.querySelector('button[type="submit"]');
-  
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting...";
-  toast.classList.add("hidden");
+
+  const form = document.getElementById("ticketForm");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
   const formData = new FormData(form);
 
-  const filesInput = document.getElementById("filesInput");
-  if (filesInput && filesInput.files.length > 0) {
-    Array.from(filesInput.files).forEach((file, index) => {
-      formData.append(`file${index + 1}`, file, file.name);
-    });
-  }
-
   try {
-    await fetch(scriptURL, {
+    const response = await fetch(scriptURL, {
       method: "POST",
-      body: formData,
-      mode: "no-cors" // ✅ this is the key fix
+      body: formData, // ✅ no "no-cors"
     });
 
-    toast.textContent = "✅ Ticket submitted successfully!";
-    toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
-    toast.classList.remove("hidden");
-    form.reset();
+    const result = await response.json(); // parse server response
+
+    if (result.success) {
+      alert("✅ Ticket saved successfully!");
+      form.reset();
+    } else {
+      alert("⚠️ Failed to save: " + (result.error || "Unknown error"));
+    }
   } catch (err) {
     console.error(err);
-    toast.textContent = "❌ Failed to submit. Try again.";
-    toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
-    toast.classList.remove("hidden");
+    alert("❌ Network or server error: " + err.message);
   }
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Submit Ticket";
 });
   </script>
 </body>
