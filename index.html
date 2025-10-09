@@ -14,9 +14,7 @@
 
     <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">PMNP-IS Help Center</h1>
 
-    <!-- NOTE: enctype added -->
     <form id="ticketForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" enctype="multipart/form-data">
-      <!-- (all inputs unchanged) -->
       <div class="col-span-2">
         <label class="block text-sm font-semibold">Full Name</label>
         <input type="text" name="name" required class="w-full border rounded-md p-2" />
@@ -91,10 +89,8 @@
   </div>
 
   <script>
-    // ← Replace with your published Apps Script web app URL (deployed as "Anyone")
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzgG0-tFP_ZelXrAS1RCfHw4EfiWgnHg7Lo7VR4DUHOfaQS_pXEE91xwAo-8Dghmo1k/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzgG0-tFP_ZelXrAS1RCfHw4EfiWgnHg7Lo7VR4DUHOfaQS_pXEE91xwAo-8Dghmo1k/exec"; // replace with your Apps Script Web App URL
 
-    // regionData.json loader (unchanged)
     let regionData = {};
     (async function loadRegions(){
       try {
@@ -145,69 +141,33 @@
       }
     });
 
-    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    // 🧩 Updated: fixed attachment handling for Apps Script
+    document.getElementById('ticketForm').addEventListener('submit', async function(ev) {
+      ev.preventDefault();
+      const form = ev.target;
+      const toast = document.getElementById('toast');
+      toast.classList.add('hidden');
+      toast.textContent = '';
 
-    const toast = document.getElementById("toast");
-    toast.classList.add("hidden");
-    toast.textContent = "";
+      const formData = new FormData(form);
 
-    const form = e.target;
-    const filesInput = document.getElementById("filesInput");
+      const res = await fetch(scriptURL, { method: 'POST', body: formData });
+      let result;
+      try { result = await res.json(); } catch (e) { result = null; }
 
-    const payload = {
-      name: form.name.value,
-      email: form.email.value,
-      cc: form.cc.value,
-      supportLevel: form.supportLevel.value,
-      region: form.region.value,
-      province: form.province.value,
-      municipality: form.municipality.value,
-      category: form.category.value,
-      message: form.message.value,
-      files: [],
-    };
-
-    // convert attachments to base64
-    const files = filesInput.files;
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i];
-      const base64 = await fileToBase64(f);
-      payload.files.push({
-        name: f.name,
-        type: f.type,
-        data: base64,
-      });
-    }
-
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
+      if (res.ok && result && result.success) {
+        toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
+        toast.classList.remove('hidden');
+        form.reset();
+      } else {
+        const msg = (result && result.error) ? result.error : 'Server error or invalid response';
+        toast.textContent = `❌ ${msg}`;
+        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
+        toast.classList.remove('hidden');
+        console.error('Error submitting:', result);
+      }
     });
-
-    const result = await res.json();
-
-    if (result.success) {
-      toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
-      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
-      toast.classList.remove("hidden");
-      form.reset();
-    } else {
-      toast.textContent = `❌ ${result.error}`;
-      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
-      toast.classList.remove("hidden");
-    }
-  });
-
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
-    });
-  }
   </script>
 </body>
 </html>
