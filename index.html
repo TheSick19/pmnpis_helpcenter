@@ -4,171 +4,199 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PMNP-IS Help Center</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl">
+    <div class="flex justify-center mb-4">
+      <img src="logo.png" alt="PMNP-IS Logo" class="h-16 w-auto" />
+    </div>
+
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">PMNP-IS Help Center</h1>
+
+    <!-- NOTE: enctype added -->
+    <form id="ticketForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" enctype="multipart/form-data">
+      <!-- (all inputs unchanged) -->
+      <div class="col-span-2">
+        <label class="block text-sm font-semibold">Full Name</label>
+        <input type="text" name="name" required class="w-full border rounded-md p-2" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold">Email</label>
+        <input type="email" name="email" required class="w-full border rounded-md p-2" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold">CC (optional)</label>
+        <input type="email" name="cc" placeholder="Enter additional email" class="w-full border rounded-md p-2" />
+      </div>
+
+      <div class="col-span-2">
+        <label class="block text-sm font-semibold">Support Level</label>
+        <select id="supportLevel" name="supportLevel" required class="w-full border rounded-md p-2">
+          <option value="">Select Support Level</option>
+          <option value="MPMO Support">MPMO Support</option>
+          <option value="Provincial Support">Provincial Support</option>
+          <option value="Regional Support">Regional Support</option>
+          <option value="NPMO Support">NPMO Support</option>
+        </select>
+      </div>
+
+      <div id="regionWrapper" class="hidden col-span-2 md:col-span-1">
+        <label class="block text-sm font-semibold">Region</label>
+        <select id="region" name="region" class="w-full border rounded-md p-2"></select>
+      </div>
+
+      <div id="provinceWrapper" class="hidden col-span-2 md:col-span-1">
+        <label class="block text-sm font-semibold">Province</label>
+        <select id="province" name="province" class="w-full border rounded-md p-2"></select>
+      </div>
+
+      <div id="municipalityWrapper" class="hidden col-span-2">
+        <label class="block text-sm font-semibold">Municipality</label>
+        <select id="municipality" name="municipality" class="w-full border rounded-md p-2"></select>
+      </div>
+
+      <div class="col-span-2">
+        <label class="block text-sm font-semibold">Category</label>
+        <select id="category" name="category" required class="w-full border rounded-md p-2">
+          <option value="">Select Category</option>
+          <option value="HCSC Questions/Masterlists">HCSC Questions/Masterlists</option>
+          <option value="UI/UX">UI/UX</option>
+          <option value="NPMO Support">NPMO Support</option>
+          <option value="User Role and Access">User Role and Access</option>
+          <option value="Functionality Errors">Functionality Errors</option>
+          <option value="Backend">Backend</option>
+          <option value="Dashboards, Reports and Line List">Dashboards, Reports and Line List</option>
+        </select>
+      </div>
+
+      <div class="col-span-2">
+        <label class="block text-sm font-semibold">Description</label>
+        <textarea name="message" rows="3" required class="w-full border rounded-md p-2"></textarea>
+      </div>
+
+      <div class="col-span-2">
+        <label class="block text-sm font-semibold">Attachments (optional)</label>
+        <input type="file" name="files" id="filesInput" multiple class="w-full border rounded-md p-2" />
+      </div>
+
+      <div class="col-span-2 text-center mt-4">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Submit Ticket</button>
+      </div>
+    </form>
+
+    <div id="toast" class="hidden mt-4 text-center text-white py-2 rounded-md"></div>
+  </div>
+
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwQl_ZuiNi43b6_vxxvT8X1nTWb3kKzwy0G0vBb6A8KWjgNfKAIxowXPzp-PBaBJDMH/exec"; // <<< replace with deployed Apps Script URL
+    // ← Replace with your published Apps Script web app URL (deployed as "Anyone")
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwendR7iuDkVotpTOPxwZGdZByHIZ3b5a3T2H0USNnSRcbGorvX-24HOKDU3f13wfqY/exec";
 
-    async function loadRegions() {
-      const res = await fetch("regionData.json");
-      const data = await res.json();
-      window.regionData = data;
-      populateRegionDropdown();
-    }
-
-    function populateRegionDropdown() {
-      const regionSelect = document.getElementById("region");
-      regionSelect.innerHTML = '<option value="">-- Select Region --</option>';
-      Object.keys(regionData).forEach(region => {
-        const opt = document.createElement("option");
-        opt.value = region;
-        opt.textContent = region;
-        regionSelect.appendChild(opt);
-      });
-    }
-
-    function updateProvinceDropdown() {
-      const region = document.getElementById("region").value;
-      const provinceSelect = document.getElementById("province");
-      const muniSelect = document.getElementById("municipality");
-
-      provinceSelect.innerHTML = '<option value="">-- Select Province --</option>';
-      muniSelect.innerHTML = '<option value="">-- Select Municipality --</option>';
-
-      if (region && regionData[region]) {
-        Object.keys(regionData[region]).forEach(prov => {
-          const opt = document.createElement("option");
-          opt.value = prov;
-          opt.textContent = prov;
-          provinceSelect.appendChild(opt);
-        });
-      }
-    }
-
-    function updateMunicipalityDropdown() {
-      const region = document.getElementById("region").value;
-      const province = document.getElementById("province").value;
-      const muniSelect = document.getElementById("municipality");
-
-      muniSelect.innerHTML = '<option value="">-- Select Municipality --</option>';
-      if (region && province && regionData[region] && regionData[region][province]) {
-        regionData[region][province].forEach(muni => {
-          const opt = document.createElement("option");
-          opt.value = muni;
-          opt.textContent = muni;
-          muniSelect.appendChild(opt);
-        });
-      }
-    }
-
-    function updateFields() {
-      const support = document.getElementById("supportLevel").value;
-      document.getElementById("regionDiv").style.display = "none";
-      document.getElementById("provinceDiv").style.display = "none";
-      document.getElementById("municipalityDiv").style.display = "none";
-
-      if (support === "MPMO Support") {
-        document.getElementById("regionDiv").style.display = "block";
-        document.getElementById("provinceDiv").style.display = "block";
-        document.getElementById("municipalityDiv").style.display = "block";
-      } else if (support === "Provincial Support") {
-        document.getElementById("regionDiv").style.display = "block";
-        document.getElementById("provinceDiv").style.display = "block";
-      } else if (support === "Regional Support") {
-        document.getElementById("regionDiv").style.display = "block";
-      }
-    }
-
-    async function handleSubmit(e) {
-      e.preventDefault();
-      const form = document.getElementById("helpForm");
-      const status = document.getElementById("status");
-
-      status.textContent = "Submitting...";
-      status.className = "text-yellow-600";
-
-      const formData = new FormData(form);
-
+    // regionData.json loader (unchanged)
+    let regionData = {};
+    (async function loadRegions(){
       try {
-        const response = await fetch(scriptURL, { method: "POST", body: formData });
-        const result = await response.json();
+        const r = await fetch('regionData.json');
+        regionData = await r.json();
+        const regionSel = document.getElementById('region');
+        regionSel.innerHTML = '<option value="">Select Region</option>';
+        Object.keys(regionData).forEach(k => {
+          regionSel.innerHTML += `<option value="${k}">${k}</option>`;
+        });
+      } catch(e) { console.warn('region load failed', e); }
+    })();
 
-        if (result.success) {
-          status.textContent = "✅ Ticket submitted successfully!";
-          status.className = "text-green-600";
+    const supportSelect = document.getElementById("supportLevel");
+    const regionWrapper = document.getElementById("regionWrapper");
+    const provinceWrapper = document.getElementById("provinceWrapper");
+    const municipalityWrapper = document.getElementById("municipalityWrapper");
+
+    document.getElementById('region').addEventListener('change', () => {
+      const region = document.getElementById('region').value;
+      const provSel = document.getElementById('province');
+      provSel.innerHTML = '<option value="">Select Province</option>';
+      document.getElementById('municipality').innerHTML = '<option value="">Select Municipality</option>';
+      if (regionData[region]) Object.keys(regionData[region]).forEach(p=> provSel.innerHTML += `<option value="${p}">${p}</option>`);
+    });
+
+    document.getElementById('province').addEventListener('change', () => {
+      const region = document.getElementById('region').value;
+      const province = document.getElementById('province').value;
+      const muniSel = document.getElementById('municipality');
+      muniSel.innerHTML = '<option value="">Select Municipality</option>';
+      if (regionData[region] && regionData[region][province]) {
+        regionData[region][province].forEach(m=> muniSel.innerHTML += `<option value="${m}">${m}</option>`);
+      }
+    });
+
+    supportSelect.addEventListener('change', () => {
+      const val = supportSelect.value;
+      regionWrapper.classList.add('hidden');
+      provinceWrapper.classList.add('hidden');
+      municipalityWrapper.classList.add('hidden');
+      if (val === 'MPMO Support') {
+        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden'); municipalityWrapper.classList.remove('hidden');
+      } else if (val === 'Provincial Support') {
+        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden');
+      } else if (val === 'Regional Support') {
+        regionWrapper.classList.remove('hidden');
+      }
+    });
+
+    // ----- IMPORTANT: replace fetch() with XHR and append individual file keys -----
+    document.getElementById('ticketForm').addEventListener('submit', function(ev) {
+      ev.preventDefault();
+      const form = ev.target;
+      const toast = document.getElementById('toast');
+      toast.classList.add('hidden');
+      toast.textContent = '';
+
+      const formData = new FormData();
+
+      // append text fields (use same names the backend expects)
+      const fields = ['name','email','cc','supportLevel','region','province','municipality','category','message'];
+      fields.forEach(k => {
+        const el = form.querySelector(`[name="${k}"]`);
+        if (el) formData.append(k, el.value || '');
+      });
+
+      // append files individually as file0,file1,... so Apps Script will receive them reliably
+      const filesInput = document.getElementById('filesInput');
+      if (filesInput && filesInput.files && filesInput.files.length) {
+        Array.from(filesInput.files).forEach((f, i) => {
+          formData.append(`file${i+1}`, f, f.name);
+        });
+      }
+
+      // XHR request (more reliable cross-browser for multipart -> Apps Script)
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', scriptURL, true);
+      xhr.onload = function() {
+        let result = null;
+        try { result = JSON.parse(xhr.responseText); } catch (e) { result = null; }
+        if (xhr.status >= 200 && xhr.status < 300 && result && result.success) {
+          toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
+          toast.classList.remove('hidden');
           form.reset();
         } else {
-          status.textContent = "❌ Error: " + (result.error || "Please try again.");
-          status.className = "text-red-600";
+          const msg = (result && result.error) ? result.error : 'Server error or invalid response';
+          toast.textContent = `❌ ${msg}`;
+          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
+          toast.classList.remove('hidden');
+          console.error('XHR result', xhr.status, xhr.responseText);
         }
-      } catch (err) {
-        status.textContent = "❌ Network error: " + err;
-        status.className = "text-red-600";
-      }
-    }
-
-    window.onload = loadRegions;
+      };
+      xhr.onerror = function(err) {
+        toast.textContent = '❌ Network error — check console';
+        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
+        toast.classList.remove('hidden');
+        console.error('XHR error', err);
+      };
+      xhr.send(formData);
+    });
   </script>
-</head>
-<body class="bg-gray-100 flex justify-center items-center min-h-screen">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-    <h1 class="text-2xl font-bold mb-4 text-center">PMNP-IS Help Center</h1>
-
-    <form id="helpForm" onsubmit="handleSubmit(event)" enctype="multipart/form-data">
-      <label class="block mb-2 font-semibold">Name:</label>
-      <input type="text" name="name" class="border w-full p-2 mb-3 rounded" required />
-
-      <label class="block mb-2 font-semibold">Email:</label>
-      <input type="email" name="email" class="border w-full p-2 mb-3 rounded" required />
-
-      <label class="block mb-2 font-semibold">CC (optional):</label>
-      <input type="email" name="cc" class="border w-full p-2 mb-3 rounded" />
-
-      <label class="block mb-2 font-semibold">Support Level:</label>
-      <select name="supportLevel" id="supportLevel" class="border w-full p-2 mb-3 rounded" onchange="updateFields()" required>
-        <option value="">-- Select --</option>
-        <option value="NPMO">NPMO</option>
-        <option value="Regional Support">Regional Support</option>
-        <option value="Provincial Support">Provincial Support</option>
-        <option value="MPMO Support">MPMO Support</option>
-      </select>
-
-      <div id="regionDiv" style="display:none;">
-        <label class="block mb-2 font-semibold">Region:</label>
-        <select name="region" id="region" class="border w-full p-2 mb-3 rounded" onchange="updateProvinceDropdown()"></select>
-      </div>
-
-      <div id="provinceDiv" style="display:none;">
-        <label class="block mb-2 font-semibold">Province:</label>
-        <select name="province" id="province" class="border w-full p-2 mb-3 rounded" onchange="updateMunicipalityDropdown()"></select>
-      </div>
-
-      <div id="municipalityDiv" style="display:none;">
-        <label class="block mb-2 font-semibold">Municipality:</label>
-        <select name="municipality" id="municipality" class="border w-full p-2 mb-3 rounded"></select>
-      </div>
-
-      <label class="block mb-2 font-semibold">Category:</label>
-      <select name="category" class="border w-full p-2 mb-3 rounded" required>
-        <option value="">-- Select Category --</option>
-        <option value="System Access">System Access</option>
-        <option value="Encoding Issues">Encoding Issues</option>
-        <option value="UI/UX">UI/UX</option>
-        <option value="Indicator Computation">Indicator Computation</option>
-        <option value="Report Generation">Report Generation</option>
-        <option value="System Error">System Error</option>
-        <option value="Data Discrepancy">Data Discrepancy</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label class="block mb-2 font-semibold">Message:</label>
-      <textarea name="message" rows="4" class="border w-full p-2 mb-3 rounded" required></textarea>
-
-      <label class="block mb-2 font-semibold">Attach Files (optional):</label>
-      <input type="file" name="attachments" id="attachments" class="border w-full p-2 mb-3 rounded" multiple />
-
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Submit Ticket</button>
-      <p id="status" class="text-center mt-3 font-semibold"></p>
-    </form>
-  </div>
 </body>
 </html>
