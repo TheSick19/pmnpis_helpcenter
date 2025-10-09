@@ -76,7 +76,7 @@
   </div>
 
   <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxZO5m19jHccGvlN5zqn5Ak08wj_BNI_479ncIXY6-vfVBzV5QtZ_2QcyVQj-3O3pQr/exec"; // <-- Replace with your Web App URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbx6afN-8gDt9Sc3k97Cc_jSag_6exjKPMBLW2Gwf2KLA4TAA8TEb0yFXTHJ1puha2Js/exec"; // <-- Replace with your Apps Script Web App URL
 
 const categorySelect = document.getElementById("category");
 const regionWrapper = document.getElementById("regionWrapper");
@@ -88,19 +88,19 @@ const provinceSelect = document.getElementById("province");
 const municipalitySelect = document.getElementById("municipality");
 const toast = document.getElementById("toast");
 
-// Load Region Data
+// --- Load Region Data ---
 let regionData = {};
 fetch("regionData.json")
   .then(res => res.json())
   .then(data => {
     regionData = data;
     regionSelect.innerHTML = `<option value="">Select Region</option>`;
-    Object.keys(regionData).forEach(r => {
-      regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+    Object.keys(regionData).forEach(region => {
+      regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
     });
   });
 
-// --- Dropdown Chaining ---
+// --- Dropdown chaining ---
 regionSelect.addEventListener("change", () => {
   const region = regionSelect.value;
   provinceSelect.innerHTML = `<option value="">Select Province</option>`;
@@ -117,13 +117,13 @@ provinceSelect.addEventListener("change", () => {
   const province = provinceSelect.value;
   municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
   if (region && province && regionData[region][province]) {
-    regionData[region][province].forEach(m => {
-      municipalitySelect.innerHTML += `<option value="${m}">${m}</option>`;
+    regionData[region][province].forEach(muni => {
+      municipalitySelect.innerHTML += `<option value="${muni}">${muni}</option>`;
     });
   }
 });
 
-// --- Show fields based on support level ---
+// --- Category visibility logic ---
 categorySelect.addEventListener("change", () => {
   const selected = categorySelect.value;
   regionWrapper.classList.add("hidden");
@@ -153,18 +153,18 @@ document.getElementById("ticketForm").addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (result.success) {
-      showToast(`✅ Ticket submitted successfully! Ticket ID: ${result.ticketId}`, "bg-green-600");
+      showToast(`✅ Ticket submitted successfully! ID: ${result.ticketId}`, "bg-green-600");
       form.reset();
     } else {
       showToast(`❌ ${result.error}`, "bg-red-600");
     }
   } catch (error) {
     console.error(error);
-    showToast("❌ Failed to submit. Please try again.", "bg-red-600");
+    showToast("❌ Error submitting ticket. Please try again.", "bg-red-600");
   }
 });
 
-// --- Toast Helper ---
+// --- Toast helper ---
 function showToast(msg, color) {
   toast.textContent = msg;
   toast.className = `mt-4 text-center text-white py-2 rounded-md ${color}`;
