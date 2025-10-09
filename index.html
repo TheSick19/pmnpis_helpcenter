@@ -76,94 +76,102 @@
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxxKiNQI_DAUoZL9R36iKwQREP4Cby9XBGoq923H6TL3rcvoRm6cRktMBdirgUMu9ta/exec"; // Replace with your /exec URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbxZO5m19jHccGvlN5zqn5Ak08wj_BNI_479ncIXY6-vfVBzV5QtZ_2QcyVQj-3O3pQr/exec"; // <-- Replace with your Web App URL
 
-    const regionSelect = document.getElementById("region");
-    const provinceSelect = document.getElementById("province");
-    const municipalitySelect = document.getElementById("municipality");
-    const categorySelect = document.getElementById("category");
-    const toast = document.getElementById("toast");
+const categorySelect = document.getElementById("category");
+const regionWrapper = document.getElementById("regionWrapper");
+const provinceWrapper = document.getElementById("provinceWrapper");
+const municipalityWrapper = document.getElementById("municipalityWrapper");
 
-    const regionWrapper = document.getElementById("regionWrapper");
-    const provinceWrapper = document.getElementById("provinceWrapper");
-    const municipalityWrapper = document.getElementById("municipalityWrapper");
+const regionSelect = document.getElementById("region");
+const provinceSelect = document.getElementById("province");
+const municipalitySelect = document.getElementById("municipality");
+const toast = document.getElementById("toast");
 
-    // Load region data
-    let regionData = {};
-    fetch("regionData.json")
-      .then(res => res.json())
-      .then(data => {
-        regionData = data;
-        populateRegions();
-      });
+// Load Region Data
+let regionData = {};
+fetch("regionData.json")
+  .then(res => res.json())
+  .then(data => {
+    regionData = data;
+    regionSelect.innerHTML = `<option value="">Select Region</option>`;
+    Object.keys(regionData).forEach(r => {
+      regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+    });
+  });
 
-    function populateRegions() {
-      regionSelect.innerHTML = '<option value="">Select Region</option>';
-      Object.keys(regionData).forEach(region => {
-        regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
-      });
+// --- Dropdown Chaining ---
+regionSelect.addEventListener("change", () => {
+  const region = regionSelect.value;
+  provinceSelect.innerHTML = `<option value="">Select Province</option>`;
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (region && regionData[region]) {
+    Object.keys(regionData[region]).forEach(prov => {
+      provinceSelect.innerHTML += `<option value="${prov}">${prov}</option>`;
+    });
+  }
+});
+
+provinceSelect.addEventListener("change", () => {
+  const region = regionSelect.value;
+  const province = provinceSelect.value;
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (region && province && regionData[region][province]) {
+    regionData[region][province].forEach(m => {
+      municipalitySelect.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+  }
+});
+
+// --- Show fields based on support level ---
+categorySelect.addEventListener("change", () => {
+  const selected = categorySelect.value;
+  regionWrapper.classList.add("hidden");
+  provinceWrapper.classList.add("hidden");
+  municipalityWrapper.classList.add("hidden");
+
+  if (selected === "MPMO Support") {
+    regionWrapper.classList.remove("hidden");
+    provinceWrapper.classList.remove("hidden");
+    municipalityWrapper.classList.remove("hidden");
+  } else if (selected === "Provincial Support") {
+    regionWrapper.classList.remove("hidden");
+    provinceWrapper.classList.remove("hidden");
+  } else if (selected === "Regional Support") {
+    regionWrapper.classList.remove("hidden");
+  }
+});
+
+// --- Form submission ---
+document.getElementById("ticketForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(scriptURL, { method: "POST", body: formData });
+    const result = await response.json();
+
+    if (result.success) {
+      showToast(`✅ Ticket submitted successfully! Ticket ID: ${result.ticketId}`, "bg-green-600");
+      form.reset();
+    } else {
+      showToast(`❌ ${result.error}`, "bg-red-600");
     }
+  } catch (error) {
+    console.error(error);
+    showToast("❌ Failed to submit. Please try again.", "bg-red-600");
+  }
+});
 
-    regionSelect.addEventListener("change", () => {
-      const provinces = Object.keys(regionData[regionSelect.value] || {});
-      provinceSelect.innerHTML = '<option value="">Select Province</option>';
-      provinces.forEach(prov => {
-        provinceSelect.innerHTML += `<option value="${prov}">${prov}</option>`;
-      });
-      municipalitySelect.innerHTML = '<option value="">Select Municipality</option>';
-    });
+// --- Toast Helper ---
+function showToast(msg, color) {
+  toast.textContent = msg;
+  toast.className = `mt-4 text-center text-white py-2 rounded-md ${color}`;
+  toast.classList.remove("hidden");
+  setTimeout(() => toast.classList.add("hidden"), 4000);
+}
+</script>
 
-    provinceSelect.addEventListener("change", () => {
-      const munis = regionData[regionSelect.value]?.[provinceSelect.value] || [];
-      municipalitySelect.innerHTML = '<option value="">Select Municipality</option>';
-      munis.forEach(m => {
-        municipalitySelect.innerHTML += `<option value="${m}">${m}</option>`;
-      });
-    });
-
-    categorySelect.addEventListener("change", () => {
-      const val = categorySelect.value;
-      regionWrapper.classList.add("hidden");
-      provinceWrapper.classList.add("hidden");
-      municipalityWrapper.classList.add("hidden");
-
-      if (val === "MPMO Support") {
-        regionWrapper.classList.remove("hidden");
-        provinceWrapper.classList.remove("hidden");
-        municipalityWrapper.classList.remove("hidden");
-      } else if (val === "Provincial Support") {
-        regionWrapper.classList.remove("hidden");
-        provinceWrapper.classList.remove("hidden");
-      } else if (val === "Regional Support") {
-        regionWrapper.classList.remove("hidden");
-      }
-    });
-
-    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-
-      try {
-        const res = await fetch(scriptURL, { method: "POST", body: formData });
-        const data = await res.json();
-
-        if (data.success) {
-          showToast(`✅ Ticket submitted! ID: ${data.ticketId}`, "bg-green-600");
-          e.target.reset();
-        } else {
-          showToast(`❌ ${data.error}`, "bg-red-600");
-        }
-      } catch (err) {
-        showToast("❌ Network error. Please try again.", "bg-red-600");
-      }
-    });
-
-    function showToast(msg, color) {
-      toast.textContent = msg;
-      toast.className = `mt-4 text-center text-white py-2 rounded-md ${color}`;
-      toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 4000);
-    }
-  </script>
 </body>
 </html>
