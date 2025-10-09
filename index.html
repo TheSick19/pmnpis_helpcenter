@@ -89,8 +89,7 @@
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzaYl85jGoJOabG5QVzoqTxqVNoTo_N7BRtDqnjSsVZgmUR1uuTUr4_M2XGHaWwbY6b/exec"; // replace with your Apps Script Web App URL
-
+    
     let regionData = {};
     (async function loadRegions(){
       try {
@@ -144,6 +143,8 @@
     // 🧩 Updated: fixed attachment handling for Apps Script
    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+const scriptURL = "https://script.google.com/macros/s/AKfycbzaYl85jGoJOabG5QVzoqTxqVNoTo_N7BRtDqnjSsVZgmUR1uuTUr4_M2XGHaWwbY6b/exec"; 
      
   const fileInput = document.getElementById("attachments");
   const files = fileInput.files;
