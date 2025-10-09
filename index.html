@@ -27,9 +27,9 @@
       </div>
 
       <div class="col-span-2">
-        <label class="block text-sm font-semibold">Type of Concern</label>
-        <select id="category" name="category" required class="w-full border rounded-md p-2">
-          <option value="">Select Concern</option>
+        <label class="block text-sm font-semibold">Support Level</label>
+        <select id="supportLevel" name="supportLevel" required class="w-full border rounded-md p-2">
+          <option value="">Select Support Level</option>
           <option value="MPMO Support">MPMO Support</option>
           <option value="Provincial Support">Provincial Support</option>
           <option value="Regional Support">Regional Support</option>
@@ -53,8 +53,17 @@
       </div>
 
       <div class="col-span-2">
-        <label class="block text-sm font-semibold">Subject</label>
-        <input type="text" name="subject" required class="w-full border rounded-md p-2" />
+        <label class="block text-sm font-semibold">Category</label>
+        <select id="category" name="category" required class="w-full border rounded-md p-2">
+          <option value="">Select Category</option>
+          <option value="MPMO Support">MPMO Support</option>
+          <option value="Provincial Support">HCSC Questions/Masterlists</option>
+          <option value="Regional Support">UI/UX</option>
+          <option value="NPMO Support">User Role and Access</option>
+          <option value="Provincial Support">Functionality Errors</option>
+          <option value="Regional Support">Backend</option>
+          <option value="NPMO Support">Dashboards, Reports and Line List</option>
+        </select>
       </div>
 
       <div class="col-span-2">
@@ -78,7 +87,7 @@
   <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbx6afN-8gDt9Sc3k97Cc_jSag_6exjKPMBLW2Gwf2KLA4TAA8TEb0yFXTHJ1puha2Js/exec"; // <-- Replace with your Apps Script Web App URL
 
-const categorySelect = document.getElementById("category");
+const supportSelect = document.getElementById("supportLevel");
 const regionWrapper = document.getElementById("regionWrapper");
 const provinceWrapper = document.getElementById("provinceWrapper");
 const municipalityWrapper = document.getElementById("municipalityWrapper");
@@ -123,9 +132,9 @@ provinceSelect.addEventListener("change", () => {
   }
 });
 
-// --- Category visibility logic ---
-categorySelect.addEventListener("change", () => {
-  const selected = categorySelect.value;
+// --- Suport Level visibility logic ---
+supportSelect.addEventListener("change", () => {
+  const selected = supportSelect.value;
   regionWrapper.classList.add("hidden");
   provinceWrapper.classList.add("hidden");
   municipalityWrapper.classList.add("hidden");
