@@ -88,26 +88,77 @@
   </div>
 
   <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwIxJ6Uuwm3AYOI6O2pVUzBxWQLAg5TfW4C6H1UxxDtfqIs5FOeByM6fmuIUPOURYz-/exec"; 
+const scriptURL = "https://script.google.com/macros/s/AKfycbwIxJ6Uuwm3AYOI6O2pVUzBxWQLAg5TfW4C6H1UxxDtfqIs5FOeByM6fmuIUPOURYz-/exec"; // <-- Replace with your Apps Script Web App URL
 
+const supportSelect = document.getElementById("supportLevel");
+const regionWrapper = document.getElementById("regionWrapper");
+const provinceWrapper = document.getElementById("provinceWrapper");
+const municipalityWrapper = document.getElementById("municipalityWrapper");
+
+const regionSelect = document.getElementById("region");
+const provinceSelect = document.getElementById("province");
+const municipalitySelect = document.getElementById("municipality");
+const toast = document.getElementById("toast");
+
+// --- Load Region Data ---
+let regionData = {};
+fetch("regionData.json")
+  .then(res => res.json())
+  .then(data => {
+    regionData = data;
+    regionSelect.innerHTML = `<option value="">Select Region</option>`;
+    Object.keys(regionData).forEach(region => {
+      regionSelect.innerHTML += `<option value="${region}">${region}</option>`;
+    });
+  });
+
+// --- Dropdown chaining ---
+regionSelect.addEventListener("change", () => {
+  const region = regionSelect.value;
+  provinceSelect.innerHTML = `<option value="">Select Province</option>`;
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (region && regionData[region]) {
+    Object.keys(regionData[region]).forEach(prov => {
+      provinceSelect.innerHTML += `<option value="${prov}">${prov}</option>`;
+    });
+  }
+});
+
+provinceSelect.addEventListener("change", () => {
+  const region = regionSelect.value;
+  const province = provinceSelect.value;
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (region && province && regionData[region][province]) {
+    regionData[region][province].forEach(muni => {
+      municipalitySelect.innerHTML += `<option value="${muni}">${muni}</option>`;
+    });
+  }
+});
+
+// --- Suport Level visibility logic ---
+supportSelect.addEventListener("change", () => {
+  const selected = supportSelect.value;
+  regionWrapper.classList.add("hidden");
+  provinceWrapper.classList.add("hidden");
+  municipalityWrapper.classList.add("hidden");
+
+  if (selected === "MPMO Support") {
+    regionWrapper.classList.remove("hidden");
+    provinceWrapper.classList.remove("hidden");
+    municipalityWrapper.classList.remove("hidden");
+  } else if (selected === "Provincial Support") {
+    regionWrapper.classList.remove("hidden");
+    provinceWrapper.classList.remove("hidden");
+  } else if (selected === "Regional Support") {
+    regionWrapper.classList.remove("hidden");
+  }
+});
+
+// --- Form submission ---
 document.getElementById("ticketForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
-  const formData = new FormData();
-
-  // Append all text fields manually
-  ["name", "email", "cc", "supportLevel", "region", "province", "municipality", "category", "message"].forEach(id => {
-    const el = form.querySelector(`[name="${id}"]`);
-    if (el) formData.append(id, el.value);
-  });
-
-  // ✅ Append all files individually
-  const fileInput = form.querySelector('input[name="files"]');
-  if (fileInput && fileInput.files.length > 0) {
-    Array.from(fileInput.files).forEach((file, idx) => {
-      formData.append(`file${idx + 1}`, file);
-    });
-  }
+  const formData = new FormData(form);
 
   try {
     const response = await fetch(scriptURL, { method: "POST", body: formData });
@@ -119,21 +170,20 @@ document.getElementById("ticketForm").addEventListener("submit", async (e) => {
     } else {
       showToast(`❌ ${result.error}`, "bg-red-600");
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     showToast("❌ Error submitting ticket. Please try again.", "bg-red-600");
   }
 });
 
+// --- Toast helper ---
 function showToast(msg, color) {
-  const toast = document.getElementById("toast");
   toast.textContent = msg;
   toast.className = `mt-4 text-center text-white py-2 rounded-md ${color}`;
   toast.classList.remove("hidden");
   setTimeout(() => toast.classList.add("hidden"), 4000);
 }
 </script>
-
 
 </body>
 </html>
