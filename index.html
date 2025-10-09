@@ -152,35 +152,34 @@ document.getElementById("ticketForm").addEventListener("submit", async function(
   const form = ev.target;
   const toast = document.getElementById("toast");
   const submitBtn = form.querySelector('button[type="submit"]');
+  
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
   toast.classList.add("hidden");
 
-  const formData = new FormData();
-  ["name","email","cc","supportLevel","region","province","municipality","category","message"]
-    .forEach(k => formData.append(k, form.querySelector(`[name="${k}"]`)?.value || ""));
+  const formData = new FormData(form);
 
   const filesInput = document.getElementById("filesInput");
-  if (filesInput?.files?.length) {
-    Array.from(filesInput.files).forEach((f,i) => formData.append(`file${i+1}`, f, f.name));
+  if (filesInput && filesInput.files.length > 0) {
+    Array.from(filesInput.files).forEach((file, index) => {
+      formData.append(`file${index + 1}`, file, file.name);
+    });
   }
 
   try {
-    const res = await fetch(scriptURL, {
+    await fetch(scriptURL, {
       method: "POST",
-      body: formData,  // ✅ no JSON, no headers
-      mode: "no-cors"  // ✅ tells browser not to block
+      body: formData,
+      mode: "no-cors" // ✅ this is the key fix
     });
 
-    // ⚠️ With no-cors, you can’t read response in browser (opaque response)
-    // but Apps Script still receives and processes it.
     toast.textContent = "✅ Ticket submitted successfully!";
     toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
     toast.classList.remove("hidden");
     form.reset();
   } catch (err) {
     console.error(err);
-    toast.textContent = "❌ Submission failed. Try again.";
+    toast.textContent = "❌ Failed to submit. Try again.";
     toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
     toast.classList.remove("hidden");
   }
