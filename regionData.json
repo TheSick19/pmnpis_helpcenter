@@ -1,0 +1,313 @@
+{
+  "Region III (Central Luzon)": {
+    "Nueva Ecija": [
+      "Cuyapo"
+    ]
+  },
+  "Region IV-A (CALABARZON)": {
+    "Quezon": [
+      "Alabat",
+      "Buenavista",
+      "Burdeos",
+      "Calauag",
+      "Candelaria",
+      "Catanauan",
+      "General Nakar",
+      "Guinayangan",
+      "Gumaca",
+      "Jomalig",
+      "Macalelon",
+      "Panukulan",
+      "Patnanungan",
+      "Perez",
+      "Pitogo",
+      "Plaridel",
+      "Polillo",
+      "Quezon",
+      "San Andres",
+      "San Antonio",
+      "San Francisco",
+      "San Narciso",
+      "Tagkawayan",
+      "Unisan"
+    ]
+  },
+  "Region IV-B (MIMAROPA) Region": {
+    "Occidental Mindoro": [
+      "Abra De Ilog",
+      "Calintaan",
+      "Lubang",
+      "Mamburao",
+      "Paluan",
+      "Rizal",
+      "Santa Cruz"
+    ],
+    "Romblon": [
+      "Banton",
+      "Cajidiocan",
+      "Calatrava",
+      "Corcuera",
+      "Ferrol",
+      "San Jose",
+      "Santa Maria"
+    ]
+  },
+  "Region V (Bicol Region)": {
+    "Camarines Sur": [
+      "Baao",
+      "Balatan",
+      "Bato",
+      "Bombon",
+      "Buhi",
+      "Cabusao",
+      "Calabanga",
+      "Canaman",
+      "Caramoan",
+      "Del Gallego",
+      "Gainza",
+      "Garchitorena",
+      "Lagonoy",
+      "Libmanan",
+      "Lupi",
+      "Magarao",
+      "Milaor",
+      "Minalabac",
+      "Nabua",
+      "Ocampo",
+      "Pamplona",
+      "Pasacao",
+      "Presentacion",
+      "Ragay",
+      "San Fernando",
+      "San Jose",
+      "Sipocot",
+      "Siruma",
+      "Tigaon",
+      "Tinambac"
+    ],
+    "Catanduanes": [
+      "Bagamanoc",
+      "Caramoran",
+      "Gigmoto",
+      "San Andres",
+      "San Miguel",
+      "Viga",
+      "Virac"
+    ],
+    "Masbate": [
+      "Aroroy",
+      "Baleno",
+      "Balud",
+      "Batuan",
+      "Cataingan",
+      "Cawayan",
+      "Claveria",
+      "Dimasalang",
+      "Esperanza",
+      "Milagros",
+      "Mobo",
+      "Monreal",
+      "Pio V. Corpus",
+      "Placer",
+      "San Fernando",
+      "Uson"
+    ],
+    "Sorsogon": [
+      "Castilla",
+      "Donsol",
+      "Irosin",
+      "Juban",
+      "Magallanes",
+      "Matnog",
+      "Prieto Diaz"
+    ]
+  },
+  "Region VI (Western Visayas)": {
+    "Iloilo": [
+      "Badiangan",
+      "Carles",
+      "Dueñas"
+    ],
+    "Negros Occidental": [
+      "Calatrava",
+      "Salvador Benedicto"
+    ]
+  },
+  "Region VII (Central Visayas)": {
+    "Cebu": [
+      "Alcantara",
+      "Alcoy",
+      "Asturias",
+      "Catmon",
+      "Dalaguete",
+      "Dumanjug",
+      "Ginatilan",
+      "Madridejos",
+      "Malabuyoc",
+      "Pilar",
+      "Samboan",
+      "Santander",
+      "Sibonga",
+      "Tabogon",
+      "Tuburan",
+      "Tudela"
+    ],
+    "Negros Oriental": [
+      "Amlan",
+      "Basay",
+      "Jimalalud",
+      "Mabinay",
+      "Manjuyod",
+      "San Jose",
+      "Sibulan",
+      "Vallehermoso"
+    ]
+  },
+  "Region VIII (Eastern Visayas)": {
+    "Eastern Samar": [
+      "Arteche",
+      "Balangkayan",
+      "Can-Avid",
+      "General Macarthur",
+      "Giporlos",
+      "Hernani",
+      "Jipapad",
+      "Lawaan",
+      "Maslog",
+      "Maydolong",
+      "Mercedes",
+      "Oras",
+      "San Julian",
+      "San Policarpo"
+    ],
+    "Leyte": [
+      "Abuyog",
+      "Babatngon",
+      "Calubian",
+      "Capoocan",
+      "Carigara",
+      "Hilongos",
+      "Hindang",
+      "Inopacan",
+      "Isabel",
+      "Javier",
+      "La Paz",
+      "Leyte",
+      "Macarthur",
+      "Mahaplag",
+      "Matalom",
+      "Mayorga",
+      "Palo",
+      "Palompon",
+      "Pastrana",
+      "San Miguel",
+      "Santa Fe",
+      "Tolosa"
+    ],
+    "Northern Samar": [
+      "Biri",
+      "Capul",
+      "Gamay",
+      "Laoang",
+      "Las Navas",
+      "Lavezares",
+      "Lope De Vega",
+      "Mapanas",
+      "Palapag",
+      "Pambujan",
+      "Rosario",
+      "San Roque",
+      "Silvino Lobos",
+      "Victoria"
+    ],
+    "Samar": [
+      "Almagro",
+      "Basey",
+      "Calbiga",
+      "Daram",
+      "Gandara",
+      "Hinabangan",
+      "Marabut",
+      "Matuguinao",
+      "Motiong",
+      "Pagsanghan",
+      "Pinabacdao",
+      "San Jorge",
+      "San Jose De Buan",
+      "San Sebastian",
+      "Santa Margarita",
+      "Santa Rita",
+      "Santo Niño",
+      "Tarangnan",
+      "Villareal",
+      "Zumarraga"
+    ]
+  },
+  "Region IX (Zamboanga Peninsula)": {
+    "Zamboanga del Norte": [
+      "Liloy",
+      "Mutia",
+      "Sergio Osmeña Sr.",
+      "Siocon"
+    ],
+    "Zamboanga del Sur": [
+      "Guipos",
+      "Midsalip",
+      "Ramon Magsaysay",
+      "Sominot",
+      "Tigbao"
+    ]
+  },
+  "Region X (Northern Mindanao)": {
+    "Bukidnon": [
+      "Cabanglasan",
+      "Kalilangan",
+      "San Fernando",
+      "Talakag"
+    ],
+    "Lanao del Norte": [
+      "Baroy",
+      "Kauswagan",
+      "Maigo",
+      "Matungao",
+      "Pantar",
+      "Salvador",
+      "Tubod"
+    ]
+  },
+  "Region XI (Davao Region)": {
+    "Davao del Sur": [
+      "Magsaysay",
+      "Malalag"
+    ],
+    "Davao Occidental": [
+      "Don Marcelino",
+      "Malita",
+      "Santa Maria",
+      "Sarangani"
+    ]
+  },
+  "Region XII (SOCCSKSARGEN)": {
+    "Cotabato": [
+      "Banisilan"
+    ],
+    "Sultan Kudarat": [
+      "Palimbang"
+    ],
+    "Sarangani": [
+      "Kiamba"
+    ]
+  },
+  "Region XIII (Caraga)": {
+    "Surigao del Sur": [
+      "Bayabas",
+      "Carmen",
+      "Carrascal",
+      "Lanuza",
+      "Lingig",
+      "Madrid",
+      "San Agustin",
+      "San Miguel"
+    ]
+  }
+}
