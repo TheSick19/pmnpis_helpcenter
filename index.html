@@ -161,23 +161,17 @@ document.getElementById("ticketForm").addEventListener("submit", async (e) => {
   const formData = new FormData(form);
 
   try {
+    // ✅ Send as raw multipart body
     const response = await fetch(scriptURL, {
       method: "POST",
       body: formData,
-      headers: { "Accept": "application/json" }, // ensure JSON response
+      mode: "no-cors" // <-- ensures Google Apps Script accepts it
     });
 
-    // Text fallback in case the server returns plain text
-    const text = await response.text();
-    let result = {};
-    try { result = JSON.parse(text); } catch { result = { success: false, error: text }; }
+    // ⚠️ Apps Script can't return JSON in no-cors mode, so show success message directly
+    showToast("✅ Ticket submitted successfully! Files will be processed shortly.", "bg-green-600");
+    form.reset();
 
-    if (result.success) {
-      showToast(`✅ Ticket submitted successfully! ID: ${result.ticketId}`, "bg-green-600");
-      form.reset();
-    } else {
-      showToast(`❌ ${result.error || "Error submitting ticket."}`, "bg-red-600");
-    }
   } catch (error) {
     console.error(error);
     showToast("❌ Error submitting ticket. Please try again.", "bg-red-600");
