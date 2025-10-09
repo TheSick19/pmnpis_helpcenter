@@ -91,7 +91,7 @@
   </div>
 
   <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbwoFvyW4N3kXnALjAgABee8tmU6fcV6ErahhNmxdTx4PmYwZMn_KSQwcq02vEqREj-t/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwRVb5fvoa3n2NYeO3wVdA_KlySgZmW4n7KStkbAFtnpexoJKDajBkMARbYd94BTzUq/exec";
 
   let regionData = {};
   (async function loadRegions() {
@@ -147,57 +147,68 @@
   });
 
   // --------------------- SUBMISSION HANDLER ---------------------
- document.getElementById("ticketForm").addEventListener("submit", function(ev) {
+ document.getElementById("ticketForm").addEventListener("submit", async function(ev) {
   ev.preventDefault();
   const form = ev.target;
   const toast = document.getElementById("toast");
   const submitBtn = form.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
-  submitBtn.classList.add("opacity-70", "cursor-not-allowed");
+  toast.classList.add("hidden");
 
-  const formData = new FormData();
-  const fields = ["name", "email", "cc", "supportLevel", "region", "province", "municipality", "category", "message"];
-  fields.forEach(k => {
-    const el = form.querySelector(`[name="${k}"]`);
-    if (el) formData.append(k, el.value || "");
-  });
+  // Read all fields
+  const payload = {};
+  ["name", "email", "cc", "supportLevel", "region", "province", "municipality", "category", "message"]
+    .forEach(k => payload[k] = form.querySelector(`[name="${k}"]`)?.value || "");
 
+  // Read attached files as base64
   const filesInput = document.getElementById("filesInput");
-  if (filesInput && filesInput.files && filesInput.files.length) {
-    Array.from(filesInput.files).forEach((f, i) => formData.append(`file${i + 1}`, f, f.name));
+  payload.files = [];
+
+  if (filesInput?.files?.length) {
+    for (const file of filesInput.files) {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]); // remove data:... prefix
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      payload.files.push({
+        name: file.name,
+        type: file.type,
+        data: base64
+      });
+    }
   }
 
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", scriptURL, true);
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Ticket";
-      submitBtn.classList.remove("opacity-70", "cursor-not-allowed");
-      let result = null;
-      try { result = JSON.parse(xhr.responseText); } catch {}
-      if (xhr.status === 200 && result && result.success) {
-        toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
-        toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
-        toast.classList.remove("hidden");
-        form.reset();
-      } else {
-        toast.textContent = `❌ ${result?.error || "Upload failed"}`;
-        toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
-        toast.classList.remove("hidden");
-        console.error("Response:", xhr.responseText);
-      }
+  try {
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Ticket";
+
+    if (result.success) {
+      toast.textContent = `✅ Ticket submitted — ID: ${result.ticketId}`;
+      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-green-600";
+      form.reset();
+    } else {
+      toast.textContent = `❌ ${result.error || "Upload failed"}`;
+      toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
+      console.error(result);
     }
-  };
-  xhr.onerror = err => {
+    toast.classList.remove("hidden");
+  } catch (err) {
+    console.error(err);
     toast.textContent = "❌ Network error — please try again.";
     toast.className = "mt-4 text-center text-white py-2 rounded-md bg-red-600";
     toast.classList.remove("hidden");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit Ticket";
-  };
-  xhr.send(formData);
+  }
 });
   </script>
 </body>
