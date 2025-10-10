@@ -1,187 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PMNP-IS Help Center</title>
 <style>
   body {
     font-family: 'Inter', sans-serif;
-    background: #f8fafc;
+    background-color: #f5f7fa;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    padding: 30px;
   }
-  .card {
-    background: white;
-    padding: 40px;
+  .container {
+    background: #fff;
+    padding: 30px;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    width: 650px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 700px;
   }
   h2 {
-    color: #2563eb;
     text-align: center;
+    color: #2563eb;
     margin-bottom: 10px;
-  }
-  img {
-    display: block;
-    margin: 0 auto 20px;
-    width: 80px;
   }
   label {
     font-weight: 600;
     display: block;
-    margin-top: 12px;
+    margin-top: 15px;
   }
   input, select, textarea {
     width: 100%;
     padding: 10px;
     margin-top: 6px;
-    border: 1px solid #ddd;
     border-radius: 8px;
+    border: 1px solid #ddd;
   }
   button {
-    margin-top: 20px;
     width: 100%;
-    background: #2563eb;
+    background-color: #2563eb;
     color: white;
-    padding: 12px;
     border: none;
     border-radius: 8px;
-    cursor: pointer;
+    padding: 12px;
     font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
   }
   button:hover {
-    background: #1e40af;
+    background-color: #1d4ed8;
   }
 </style>
 </head>
 <body>
-  <div class="card">
-    <img src="logo.png" alt="Logo">
-    <h2>PMNP-IS Help Center</h2>
 
-    <form id="ticketForm">
-      <label>Full Name</label>
-      <input type="text" name="name" required>
+<div class="container">
+  <h2>PMNP-IS Help Center</h2>
+  <form id="helpForm">
+    <label>Full Name</label>
+    <input type="text" name="name" required>
 
-      <label>Email</label>
-      <input type="email" name="email" required>
+    <label>Email</label>
+    <input type="email" name="email" required>
 
-      <label>CC</label>
-      <input type="text" name="cc" placeholder="Optional">
+    <label>CC</label>
+    <input type="text" name="cc" placeholder="Optional">
 
-      <label>Support Level</label>
-      <select id="supportLevel" name="supportLevel" required>
-        <option value="">Select Support Level</option>
-        <option value="MPMO Support">MPMO Support</option>
-        <option value="Regional Support">Regional Support</option>
-        <option value="Provincial Support">Provincial Support</option>
-        <option value="NPMO Technical Workstreams">NPMO Technical Workstreams</option>
-      </select>
+    <label>Support Level</label>
+    <select id="supportLevel" name="supportLevel" required>
+      <option value="">Select Support Level</option>
+      <option value="MPMO Support">MPMO Support</option>
+      <option value="Regional Support">Regional Support</option>
+      <option value="Provincial Support">Provincial Support</option>
+      <option value="NPMO Technical Workstreams">NPMO Technical Workstreams</option>
+    </select>
 
-      <div id="orgunitFields">
-        <label>Region</label>
-        <select id="region" name="region"></select>
+    <div id="orgunitFields">
+      <label>Region</label>
+      <select id="region" name="region"></select>
 
-        <label>Province</label>
-        <select id="province" name="province"></select>
+      <label>Province</label>
+      <select id="province" name="province"></select>
 
-        <label>Municipality</label>
-        <select id="municipality" name="municipality"></select>
-      </div>
+      <label>Municipality</label>
+      <select id="municipality" name="municipality"></select>
+    </div>
 
-      <label>Category</label>
-      <select name="category" required>
-        <option>HCSC Questions/Masterlists</option>
-        <option>UI/UX</option>
-        <option>User Accounts</option>
-        <option>Additional Features</option>
-        <option>Formula and Logics</option>
-        <option>Reports and Dashboard</option>
-        <option>User Role and Access</option>
-        <option>Function</option>
-      </select>
+    <label>Category</label>
+    <select name="category" required>
+      <option>HCSC Questions/Masterlists</option>
+      <option>UI/UX</option>
+      <option>User Accounts</option>
+      <option>Additional Features</option>
+      <option>Formula and Logics</option>
+      <option>Reports and Dashboard</option>
+      <option>User Role and Access</option>
+      <option>Function</option>
+    </select>
 
-      <label>Message</label>
-      <textarea name="message" rows="4" required></textarea>
+    <label>Message</label>
+    <textarea name="message" rows="4" required></textarea>
 
-      <label>Attachments</label>
-      <input type="file" name="files" multiple>
+    <label>Attachments</label>
+    <input type="file" name="files" multiple>
 
-      <button type="submit">Submit Ticket</button>
-    </form>
-  </div>
+    <button type="submit">Submit Ticket</button>
+  </form>
+</div>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlG0CZK9Aq23l66P77nBcYC-MmQ_BrkaSV4fOfbwhTg0iuRpXXfGEz-3poXKT-8HL_/exec"; // <-- Replace with Apps Script Web App URL
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYaYXC_u0ixJnSmkParMGlW1d-S6Q8vLQuL1bnrU76_X6Vx6IZ0xwXM7giaKOea1u4/exec"; // Replace with your deployed Apps Script URL
 
-    // Load OrgUnit JSON (same structure as before)
-    let orgUnits;
-    fetch("regionData.json")
-      .then(res => res.json())
-      .then(data => {
-        orgUnits = data;
-        populateRegions();
-      });
+const supportLevel = document.getElementById("supportLevel");
+const orgunitFields = document.getElementById("orgunitFields");
+const regionSelect = document.getElementById("region");
+const provinceSelect = document.getElementById("province");
+const municipalitySelect = document.getElementById("municipality");
 
-    const regionSelect = document.getElementById("region");
-    const provinceSelect = document.getElementById("province");
-    const municipalitySelect = document.getElementById("municipality");
-    const supportSelect = document.getElementById("supportLevel");
+let regionData = [];
 
-    function populateRegions() {
-      regionSelect.innerHTML = `<option value="">Select Region</option>`;
-      orgUnits.forEach(r => {
-        regionSelect.innerHTML += `<option value="${r.name}">${r.name}</option>`;
-      });
+// Load JSON orgunit file
+fetch("regionData.json")
+  .then(res => res.json())
+  .then(data => {
+    regionData = data;
+    populateRegions();
+  });
+
+function populateRegions() {
+  regionSelect.innerHTML = `<option value="">Select Region</option>`;
+  regionData.forEach(region => {
+    regionSelect.innerHTML += `<option value="${region.region}">${region.region}</option>`;
+  });
+}
+
+regionSelect.addEventListener("change", () => {
+  const region = regionData.find(r => r.region === regionSelect.value);
+  provinceSelect.innerHTML = `<option value="">Select Province</option>`;
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (region) {
+    region.provinces.forEach(p => {
+      provinceSelect.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+    });
+  }
+});
+
+provinceSelect.addEventListener("change", () => {
+  const region = regionData.find(r => r.region === regionSelect.value);
+  const province = region?.provinces.find(p => p.name === provinceSelect.value);
+  municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
+  if (province) {
+    province.municipalities.forEach(m => {
+      municipalitySelect.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+  }
+});
+
+// Support Level Logic
+supportLevel.addEventListener("change", () => {
+  const level = supportLevel.value;
+  if (level === "NPMO Technical Workstreams") {
+    orgunitFields.style.display = "none";
+  } else {
+    orgunitFields.style.display = "block";
+    regionSelect.parentElement.style.display = "block";
+    provinceSelect.parentElement.style.display = "block";
+    municipalitySelect.parentElement.style.display = "block";
+
+    if (level === "Regional Support") {
+      provinceSelect.parentElement.style.display = "none";
+      municipalitySelect.parentElement.style.display = "none";
+    } else if (level === "Provincial Support") {
+      municipalitySelect.parentElement.style.display = "none";
     }
+  }
+});
 
-    regionSelect.addEventListener("change", () => {
-      const region = orgUnits.find(r => r.name === regionSelect.value);
-      provinceSelect.innerHTML = `<option value="">Select Province</option>`;
-      municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
-      if (region) {
-        region.provinces.forEach(p => {
-          provinceSelect.innerHTML += `<option value="${p.name}">${p.name}</option>`;
-        });
-      }
-    });
-
-    provinceSelect.addEventListener("change", () => {
-      const region = orgUnits.find(r => r.name === regionSelect.value);
-      const province = region?.provinces.find(p => p.name === provinceSelect.value);
-      municipalitySelect.innerHTML = `<option value="">Select Municipality</option>`;
-      if (province) {
-        province.municipalities.forEach(m => {
-          municipalitySelect.innerHTML += `<option value="${m}">${m}</option>`;
-        });
-      }
-    });
-
-    // Hide org units if not needed based on Support Level
-    supportSelect.addEventListener("change", () => {
-      const value = supportSelect.value;
-      document.getElementById("orgunitFields").style.display =
-        value === "NPMO Technical Workstreams" ? "none" : "block";
-    });
-
-    // Form submit
-    document.getElementById("ticketForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-
-      try {
-        const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
-        const json = await res.json();
-        if (json.success) alert("✅ Ticket submitted successfully!");
-        else alert("❌ " + json.error);
-      } catch (err) {
-        alert("❌ Network error: " + err.message);
-      }
-    });
-  </script>
+// Form Submit
+document.getElementById("helpForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  try {
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+    const json = await res.json();
+    if (json.success) alert("✅ Ticket submitted successfully!");
+    else alert("❌ " + json.error);
+  } catch (err) {
+    alert("❌ Network error: " + err.message);
+  }
+});
+</script>
 </body>
 </html>
