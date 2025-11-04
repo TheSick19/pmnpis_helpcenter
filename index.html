@@ -1,215 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title >PMNP-IS Help Center</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="refresh" content="1; url='https://script.google.com/macros/s/AKfycbyUkA8WVn-M5k7Imqf6qnZWIX9OhZ9GgBzySs_UfCauBIaq3aI9hEt29E3_E2SYx1sX/exec'" />
+  <title>Redirecting to PMNP Helpdesk...</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: white;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    a {
+      color: #fff;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .spinner {
+      margin-top: 1.5rem;
+      width: 36px;
+      height: 36px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-3xl">
-    <div class="flex justify-center mb-4">
-      <img src="pmnplogo.png" alt="PMNP-IS Logo" class="h-16 w-auto" />
-    </div>
-
-    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">PMNP-IS Help Center</h1>
-
-    <form id="ticketForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" enctype="multipart/form-data">
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Full Name</label>
-        <input type="text" name="name" required class="w-full border rounded-md p-2" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold">Email</label>
-        <input type="email" name="email" required class="w-full border rounded-md p-2" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold">CC (optional)</label>
-        <input type="email" name="cc" placeholder="Enter additional email" class="w-full border rounded-md p-2" />
-      </div>
-
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Position</label>
-        <input type="text" name="position" class="w-full border rounded-md p-2" />
-      </div>
-
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Support Level</label>
-        <select id="supportLevel" name="supportLevel" required class="w-full border rounded-md p-2">
-          <option value="">Select Support Level</option>
-          <option value="MPMO Support">MPMO Support</option>
-          <option value="Provincial Support">Provincial Support</option>
-          <option value="Regional Support">Regional Support</option>
-          <option value="NPMO Technical Workstreams">NPMO Technical Workstreams</option>
-        </select>
-      </div>
-
-      <div id="regionWrapper" class="hidden col-span-2 md:col-span-1">
-        <label class="block text-sm font-semibold">Region</label>
-        <select id="region" name="region" class="w-full border rounded-md p-2"></select>
-      </div>
-
-      <div id="provinceWrapper" class="hidden col-span-2 md:col-span-1">
-        <label class="block text-sm font-semibold">Province</label>
-        <select id="province" name="province" class="w-full border rounded-md p-2"></select>
-      </div>
-
-      <div id="municipalityWrapper" class="hidden col-span-2">
-        <label class="block text-sm font-semibold">Municipality</label>
-        <select id="municipality" name="municipality" class="w-full border rounded-md p-2"></select>
-      </div>
-
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Category</label>
-        <select id="category" name="category" required class="w-full border rounded-md p-2">
-          <option value="">Select Category</option>
-          <option value="HCSC Questions/Masterlists">HCSC Questions/Masterlists</option>
-          <option value="UI/UX">UI/UX</option>
-          <option value="NPMO Support">NPMO Support</option>
-          <option value="User Role and Access">User Role and Access</option>
-          <option value="Functionality Errors">Functionality Errors</option>
-          <option value="Backend">Backend</option>
-          <option value="Dashboards, Reports and Line List">Dashboards, Reports and Line List</option>
-        </select>
-      </div>
-
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Description</label>
-        <textarea name="message" rows="3" required class="w-full border rounded-md p-2"></textarea>
-      </div>
-
-      <div class="col-span-2">
-        <label class="block text-sm font-semibold">Attachments (optional)</label>
-        <input type="file" name="files" id="filesInput" multiple class="w-full border rounded-md p-2" />
-      </div>
-
-      <div class="col-span-2 text-center mt-4">
-        <button id="submitBtn" type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Submit Ticket</button>
-      </div>
-    </form>
-
-    <div id="toast" class="hidden mt-4 text-center text-white py-2 rounded-md"></div>
-  </div>
-
-  <script>
-    // ====== CONFIG: set your deployed Apps Script URL here ======
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzQXUhH1oIWLkEWeVMNNwZ59BSLaWVhH1qIeJIKpRMH-7GX17GdeQvSH5W8pOnn84bL/exec";
-    // ====== Path to your region/province/municipality JSON (edit if you store elsewhere) ======
-    const regionJsonPath = "regionData.json";
-
-    // load region JSON (same behavior as before)
-    let regionData = {};
-    (async function loadRegions(){
-      try {
-        const r = await fetch(regionJsonPath);
-        regionData = await r.json();
-        const regionSel = document.getElementById('region');
-        regionSel.innerHTML = '<option value="">Select Region</option>';
-        Object.keys(regionData).forEach(k => {
-          regionSel.innerHTML += `<option value="${k}">${k}</option>`;
-        });
-      } catch(e) { console.warn('region load failed', e); }
-    })();
-
-    const supportSelect = document.getElementById("supportLevel");
-    const regionWrapper = document.getElementById("regionWrapper");
-    const provinceWrapper = document.getElementById("provinceWrapper");
-    const municipalityWrapper = document.getElementById("municipalityWrapper");
-
-    document.getElementById('region').addEventListener('change', () => {
-      const region = document.getElementById('region').value;
-      const provSel = document.getElementById('province');
-      provSel.innerHTML = '<option value="">Select Province</option>';
-      document.getElementById('municipality').innerHTML = '<option value="">Select Municipality</option>';
-      if (regionData[region]) Object.keys(regionData[region]).forEach(p=> provSel.innerHTML += `<option value="${p}">${p}</option>`);
-    });
-
-    document.getElementById('province').addEventListener('change', () => {
-      const region = document.getElementById('region').value;
-      const province = document.getElementById('province').value;
-      const muniSel = document.getElementById('municipality');
-      muniSel.innerHTML = '<option value="">Select Municipality</option>';
-      if (regionData[region] && regionData[region][province]) {
-        regionData[region][province].forEach(m=> muniSel.innerHTML += `<option value="${m}">${m}</option>`);
-      }
-    });
-
-    supportSelect.addEventListener('change', () => {
-      const val = supportSelect.value;
-      regionWrapper.classList.add('hidden');
-      provinceWrapper.classList.add('hidden');
-      municipalityWrapper.classList.add('hidden');
-      if (val === 'MPMO Support') {
-        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden'); municipalityWrapper.classList.remove('hidden');
-      } else if (val === 'Provincial Support') {
-        regionWrapper.classList.remove('hidden'); provinceWrapper.classList.remove('hidden');
-      } else if (val === 'Regional Support') {
-        regionWrapper.classList.remove('hidden');
-      }
-    });
-
-    // submit handler with XHR and file keys file1,file2,...
-    document.getElementById('ticketForm').addEventListener('submit', function(ev) {
-      ev.preventDefault();
-      const form = ev.target;
-      const toast = document.getElementById('toast');
-      const submitBtn = document.getElementById('submitBtn');
-      toast.classList.add('hidden');
-      toast.textContent = '';
-
-      // disable
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting...";
-
-      const formData = new FormData();
-
-      // append text fields
-      const fields = ['name','email','cc','position','supportLevel','region','province','municipality','category','message'];
-      fields.forEach(k => {
-        const el = form.querySelector(`[name="${k}"]`);
-        if (el) formData.append(k, el.value || '');
-      });
-
-      // append files individually as file1,file2,...
-      const filesInput = document.getElementById('filesInput');
-      if (filesInput && filesInput.files && filesInput.files.length) {
-        Array.from(filesInput.files).forEach((f, i) => {
-          formData.append(`file${i+1}`, f, f.name);
-        });
-      }
-
-      // send via fetch (CORS allowed by backend)
-      fetch(scriptURL, { method: 'POST', body: formData, mode: 'cors' })
-      .then(async res => {
-        // try parse JSON response
-        let data = null;
-        try { data = await res.json(); } catch(e){ data = null; }
-        if (res.ok && data && data.success) {
-          toast.textContent = `✅ Ticket submitted — ID: ${data.ticketId}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-green-600';
-          toast.classList.remove('hidden');
-          form.reset();
-        } else {
-          const errMsg = data && data.error ? data.error : `HTTP ${res.status}`;
-          toast.textContent = `❌ ${errMsg}`;
-          toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-          toast.classList.remove('hidden');
-          console.error('Submit failed', res.status, data);
-        }
-      })
-      .catch(err => {
-        toast.textContent = `❌ Network error — check console`;
-        toast.className = 'mt-4 text-center text-white py-2 rounded-md bg-red-600';
-        toast.classList.remove('hidden');
-        console.error('Fetch error', err);
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Ticket';
-      });
-    });
-  </script>
+<body>
+  <h1>Redirecting to PMNP Helpdesk...</h1>
+  <p>If you are not redirected automatically, <a href="https://script.google.com/macros/s/AKfycbyUkA8WVn-M5k7Imqf6qnZWIX9OhZ9GgBzySs_UfCauBIaq3aI9hEt29E3_E2SYx1sX/exec">click here</a>.</p>
+  <div class="spinner"></div>
 </body>
 </html>
